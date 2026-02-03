@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mother Feeding App</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --accent-color: #a29bfe;
+            --text-color: #f1f1f1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: background 1.5s ease;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 85%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-weight: 300; margin-bottom: 20px; letter-spacing: 1px; font-size: 1.5rem; opacity: 0.9; }
+
+        input[type="number"] {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            color: white;
+            font-size: 3.5rem;
+            width: 140px;
+            text-align: center;
+            margin-bottom: 25px;
+            outline: none;
+        }
+
+        button {
+            padding: 18px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        button:active { transform: scale(0.98); }
+        button.stop { background: #ff7675; color: white; margin-top: 15px; }
+
+        .theme-selector {
+            margin-top: 35px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .color-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.5);
+            transition: 0.3s;
+        }
+
+        .color-dot:hover { transform: scale(1.1); border-color: white; }
+
+        .vibration-toggle {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0.8;
+        }
+
+        .credits {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        /* Calm Breathing Animation */
+        @keyframes breathe {
+            0% { background-color: var(--bg-color); }
+            50% { background-color: var(--accent-color); }
+            100% { background-color: var(--bg-color); }
+        }
+
+        .blinking-active {
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        .timer-display {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body id="body">
+
+    <div class="container">
+        <h1>Mother Feeding App</h1>
+        
+        <div id="timer-ui">
+            <div class="timer-display" id="display">Ready</div>
+            <input type="number" id="minutes" value="18">
+            
+            <div class="controls">
+                <button id="startBtn" onclick="startTimer()">Start Timer</button>
+                <button id="stopBtn" class="stop" onclick="resetTimer()" style="display:none;">Stop & Reset</button>
+            </div>
+        </div>
+
+        <div class="vibration-toggle">
+            <input type="checkbox" id="vibrateSync" checked> 
+            <label for="vibrateSync">Vibration Alert</label>
+        </div>
+
+        <div class="theme-selector">
+            <div class="color-dot" style="background: #121212;" onclick="setTheme('#121212', '#a29bfe')"></div> 
+            <div class="color-dot" style="background: #1e272e;" onclick="setTheme('#1e272e', '#00d2d3')"></div> 
+            <div class="color-dot" style="background: #2d3436;" onclick="setTheme('#2d3436', '#fab1a0')"></div> 
+            <div class="color-dot" style="background: #000000;" onclick="setTheme('#000000', '#55efc4')"></div> 
+            <div class="color-dot" style="background: #2c3e50;" onclick="setTheme('#2c3e50', '#74b9ff')"></div> 
+            <div class="color-dot" style="background: #222f3e;" onclick="setTheme('#222f3e', '#feca57')"></div> 
+            <div class="color-dot" style="background: #192a56;" onclick="setTheme('#192a56', '#ff9ff3')"></div> 
+        </div>
+    </div>
+
+    <div class="credits">By: SamiBajwa</div>
+
+    <script>
+        let countdown;
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch (err) { console.log("WakeLock error"); }
+            }
+        }
+
+        function setTheme(bg, accent) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        }
+
+        function startTimer() {
+            const minsInput = document.getElementById('minutes');
+            let seconds = Math.floor(minsInput.value * 60);
+            
+            if(seconds <= 0) return;
+
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            minsInput.style.display = 'none';
+            
+            requestWakeLock();
+
+            countdown = setInterval(() => {
+                seconds--;
+                updateDisplay(seconds);
+
+                if (seconds <= 0) {
+                    clearInterval(countdown);
+                    triggerAlarm();
+                }
+            }, 1000);
+        }
+
+        function updateDisplay(sec) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            document.getElementById('display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function triggerAlarm() {
+            document.getElementById('body').classList.add('blinking-active');
+            document.getElementById('display').innerText = "Finished";
+            if (document.getElementById('vibrateSync').checked && "vibrate" in navigator) {
+                navigator.vibrate([500, 500, 500, 500, 500]);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(countdown);
+            document.getElementById('body').classList.remove('blinking-active');
+            document.getElementById('display').innerText = "Ready";
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('minutes').style.display = 'inline-block';
+            if (wakeLock) wakeLock.release();
+        }
+    </script>
+</body>
+</html>
