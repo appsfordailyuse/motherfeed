@@ -53,6 +53,94 @@
             opacity: 0.9; 
         }
 
+        .quote-section {
+            margin: 15px 0 25px 0;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border-left: 4px solid var(--accent-color);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, 
+                transparent 0%, 
+                transparent 40%,
+                rgba(162, 155, 254, 0.3) 50%,
+                transparent 60%,
+                transparent 100%
+            );
+            background-size: 200% 200%;
+            animation: revolveLight 8s linear infinite;
+            z-index: -1;
+            filter: blur(3px);
+        }
+
+        .quote-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            border: 2px dotted var(--accent-color);
+            opacity: 0.4;
+            animation: rotateDots 12s linear infinite;
+        }
+
+        @keyframes revolveLight {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes rotateDots {
+            0% {
+                transform: rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        .quote-text {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: var(--accent-color);
+            line-height: 1.5;
+            text-align: center;
+            opacity: 0.95;
+            transition: opacity 0.5s ease;
+        }
+
+        .quote-fade {
+            opacity: 0;
+        }
+
         input[type="number"] {
             background: rgba(255,255,255,0.05);
             border: 2px solid var(--accent-color);
@@ -163,7 +251,6 @@
 
         .history-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -209,6 +296,15 @@
             font-size: 0.85rem;
             opacity: 0.7;
             margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-ago {
+            color: #55efc4;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .history-duration {
@@ -274,6 +370,10 @@
     <div class="container">
         <h1>Mother Feeding App</h1>
         
+        <div class="quote-section">
+            <div class="quote-text" id="quoteText">"A mother's love is the fuel that enables a normal human being to do the impossible."</div>
+        </div>
+        
         <div id="timer-ui">
             <div class="status-display" id="status">Ready to Start</div>
             <div class="timer-display" id="display">0:00</div>
@@ -283,7 +383,7 @@
                 <button id="startBtn" onclick="startTimer()">Start Timer</button>
                 <button id="pauseBtn" class="pause" onclick="pauseTimer()" style="display:none;">Pause</button>
                 <button id="resumeBtn" class="resume" onclick="resumeTimer()" style="display:none;">Resume</button>
-                <button id="stopBtn" class="stop" onclick="stopTimer()" style="display:none;">Stop & Save</button>
+                <button id="stopBtn" class="stop" onclick="stopTimer()" style="display:none;">Stop</button>
             </div>
             
             <div class="paused-indicator" id="pausedIndicator" style="display:none;">
@@ -315,14 +415,14 @@
     <div class="history-container">
         <div class="history-header">
             <h2>Feeding History</h2>
-            <button class="clear-history" onclick="clearHistory()">Clear All</button>
         </div>
         <div class="history-list" id="historyList">
             <div class="no-history">No feeding records yet</div>
         </div>
+        <button class="clear-history" onclick="clearHistory()" style="width: 100%; margin-top: 15px;">Clear All</button>
     </div>
 
-    <div class="credits">By: SamiBajwa</div>
+    <div class="credits"><a href="https://www.facebook.com/samibajwaisking" target="_blank" style="color: inherit; text-decoration: none;">By: SamiBajwa</a></div>
 
     <script>
         let countdown;
@@ -332,6 +432,480 @@
         let startTime = null;
         let totalDuration = 0;
         let pausedTime = 0;
+
+        // Mother Love Quotes Collection (365+ quotes for no repeats in 30 days)
+        const motherQuotes = [
+            "A mother's love is the fuel that enables a normal human being to do the impossible.",
+            "There is no way to be a perfect mother, but a million ways to be a good one.",
+            "A mother's arms are more comforting than anyone else's.",
+            "Mother's love is peace. It need not be acquired, it need not be deserved.",
+            "Life doesn't come with a manual, it comes with a mother.",
+            "The influence of a mother in the lives of her children is beyond calculation.",
+            "A mother's love for her child is like nothing else in the world.",
+            "Motherhood: All love begins and ends there.",
+            "A mother is she who can take the place of all others but whose place no one else can take.",
+            "Behind every young child who believes in himself is a mother who believed first.",
+            "To the world you are a mother, but to your family you are the world.",
+            "A mother's hug lasts long after she lets go.",
+            "Mothers hold their children's hands for a short while, but their hearts forever.",
+            "The heart of a mother is a deep abyss at the bottom of which you will always find forgiveness.",
+            "A mother's love is the strongest energy known to mankind.",
+            "Being a mother is learning about strengths you didn't know you had.",
+            "Motherhood is the biggest gamble in the world. It is the glorious life force.",
+            "A mother's love doesn't make her son more dependent, it makes him stronger.",
+            "There is nothing as sincere as a mother's kiss.",
+            "The days are long but the years are short.",
+            "A mother understands what a child does not say.",
+            "Mothers are like glue. Even when you can't see them, they're still holding the family together.",
+            "A mother's love is patient and forgiving when all others are forsaking.",
+            "No language can express the power and beauty of a mother's love.",
+            "A mother is your first friend, your best friend, your forever friend.",
+            "The most precious jewels you'll ever have around your neck are the arms of your children.",
+            "A baby fills a place in your heart you never knew was empty.",
+            "Making the decision to have a child is momentous. It is to decide forever to have your heart go walking around outside your body.",
+            "A mother's joy begins when new life is stirring inside, when a tiny heartbeat is heard for the very first time.",
+            "There is no school for mothers. You learn on the job.",
+            "Motherhood is a choice you make every day, to put someone else's happiness before your own.",
+            "A mother's love is whole no matter how many times divided.",
+            "The loveliest masterpiece of the heart of God is the heart of a mother.",
+            "A mother's treasure is her daughter.",
+            "A son is a son till he takes him a wife, a daughter is a daughter all of her life.",
+            "Biology is the least of what makes someone a mother.",
+            "Every beetle is a gazelle in the eyes of its mother.",
+            "No one in your life will ever love you as your mother does.",
+            "Mothers and their children are in a category all their own.",
+            "A mother is the one who fills your heart in the first place.",
+            "All that I am or hope to be, I owe to my mother.",
+            "A mother's love liberates.",
+            "Mother love is the most powerful force on earth.",
+            "When you are a mother, you are never really alone in your thoughts.",
+            "A mother's love endures through all.",
+            "The only love that I really believe in is a mother's love for her children.",
+            "If love is sweet as a flower, then my mother is that sweet flower of love.",
+            "A mother's love is like an everlasting bed of roses, that continues to blossom.",
+            "A mother's happiness is like a beacon, lighting up the future.",
+            "Acceptance, tolerance, bravery, compassion. These are the things my mom taught me.",
+            "Youth fades; love droops; the leaves of friendship fall; a mother's secret hope outlives them all.",
+            "A mother is always the beginning. She is how things begin.",
+            "You never realize how much your mother loves you till you explore the attic and find every school letter you ever made.",
+            "God could not be everywhere, and therefore he made mothers.",
+            "Grown don't mean nothing to a mother. A child is a child.",
+            "A mother's arms are made of tenderness and children sleep soundly in them.",
+            "The natural state of motherhood is unselfishness.",
+            "A mother is not a person to lean on, but a person to make leaning unnecessary.",
+            "The moment a child is born, the mother is also born.",
+            "Mothers are the necessity of invention.",
+            "A mother's love never ages, it simply grows stronger with time.",
+            "Becoming a mother makes you the mother of all children.",
+            "When your mother asks, 'Do you want a piece of advice?' it is a mere formality.",
+            "A suburban mother's role is to deliver children obstetrically once, and by car forever after.",
+            "My mother's love has always been a sustaining force for our family.",
+            "A mother's love is everything. It is what brings a child into this world.",
+            "The strength of motherhood is greater than natural laws.",
+            "All mothers are rich when they love their children.",
+            "A mother's pride, a father's joy.",
+            "No matter how old a mother is, she watches her middle-aged children for signs of improvement.",
+            "There is eternal influence and power in motherhood.",
+            "Mothers possess a power beyond that of a king on his throne.",
+            "A mother is clothed with strength and dignity, laughs without fear of the future.",
+            "The tie which links mother and child is of such pure and immaculate strength.",
+            "When God thought of mother, He must have laughed with satisfaction.",
+            "A mother's love is like a tower, rising far above the crowd.",
+            "A mother's love is instinctual, unconditional, and forever.",
+            "The phrase 'working mother' is redundant.",
+            "A mother's love is like a circle, it has no beginning and no ending.",
+            "My mother had a slender, small body, but a large heart—a heart so large that everybody's joys found welcome in it.",
+            "No gift to your mother can ever equal her gift to you: life.",
+            "A mother's love is the heart of the family.",
+            "Whatever else is unsure in this stinking dunghill of a world, a mother's love is not.",
+            "Mothers are the only workers who do not have regular hours.",
+            "There is nothing in the world of art like the songs mother used to sing.",
+            "The mother's heart is the child's schoolroom.",
+            "A mother's love perceives no impossibilities.",
+            "Sweater, n.: garment worn by child when its mother is feeling chilly.",
+            "When my kids become wild and unruly, I use a nice, safe playpen.",
+            "A mother has eyes in the back of her head.",
+            "You don't have to deserve your mother's love. You have to deserve your father's.",
+            "A mother's arms are the softest place to land.",
+            "The best place to cry is on a mother's arms.",
+            "A mother's love is more beautiful than any fresh flower.",
+            "Mother: the most beautiful word on the lips of mankind.",
+            "A mother's love makes all things possible.",
+            "Mothers are the architects of nations.",
+            "The hand that rocks the cradle rules the world.",
+            "A mother knows what her child needs before the child even asks.",
+            "A mother's faith in her children is boundless.",
+            "A mother's warmth is the warmth of the sun.",
+            "Every mother is a working mother.",
+            "A mother's love gives us our first lessons in unconditional love.",
+            "The best academy, a mother's knee.",
+            "A mother's love is something that no one can explain.",
+            "Motherhood is the exquisite inconvenience of being another person's everything.",
+            "A mother's love stays with us through our entire lives.",
+            "In the eyes of a child, a mother is a goddess.",
+            "A mother's sacrifice is immeasurable.",
+            "A mother's intuition is her superpower.",
+            "A mother's patience knows no bounds.",
+            "A mother's wisdom guides us through life.",
+            "A mother's embrace can heal any wound.",
+            "A mother's smile can light up the darkest day.",
+            "A mother's voice is the sweetest sound in the world.",
+            "A mother's prayers follow you wherever you go.",
+            "A mother's encouragement can move mountains.",
+            "A mother's faith makes miracles happen.",
+            "A mother's tenderness is like no other.",
+            "A mother's devotion knows no limits.",
+            "A mother's care is the best medicine.",
+            "A mother's touch can calm any storm.",
+            "A mother's guidance is a precious gift.",
+            "A mother's kindness shapes our character.",
+            "A mother's strength carries the family.",
+            "A mother's loyalty never wavers.",
+            "A mother's compassion knows no boundaries.",
+            "A mother's dedication is unmatched.",
+            "A mother's resilience inspires us all.",
+            "A mother's gentleness is a powerful force.",
+            "A mother's understanding brings peace.",
+            "A mother's generosity is endless.",
+            "A mother's courage gives us strength.",
+            "A mother's hope lights our path.",
+            "A mother's trust builds our confidence.",
+            "A mother's support makes us fearless.",
+            "A mother's protection shields us always.",
+            "A mother's legacy lives forever.",
+            "A mother's spirit is unbreakable.",
+            "A mother's blessing is priceless.",
+            "A mother's comfort soothes all pain.",
+            "A mother's laughter fills the home with joy.",
+            "A mother's lessons shape our future.",
+            "A mother's example teaches us everything.",
+            "A mother's forgiveness is infinite.",
+            "A mother's belief in us never fades.",
+            "A mother's dream for her children knows no bounds.",
+            "A mother's memories are treasures we carry.",
+            "A mother's pride in her children shines bright.",
+            "A mother's happiness is seeing her children smile.",
+            "A mother's purpose is written in her children's eyes.",
+            "A mother's journey is the greatest adventure.",
+            "A mother's bond with her child is eternal.",
+            "A mother's watchful eyes never close.",
+            "A mother's nurturing creates strong foundations.",
+            "A mother's teaching lasts a lifetime.",
+            "A mother's commitment never falters.",
+            "A mother's grace under pressure amazes us.",
+            "A mother's multitasking is legendary.",
+            "A mother's energy seems boundless.",
+            "A mother's creativity solves every problem.",
+            "A mother's resourcefulness is remarkable.",
+            "A mother's adaptability is inspiring.",
+            "A mother's selflessness defines true love.",
+            "A mother's joy is multiplied in her children.",
+            "A mother's heart expands to hold all her children.",
+            "A mother's time is precious yet freely given.",
+            "A mother's presence makes a house a home.",
+            "A mother's magic turns ordinary moments into memories.",
+            "A mother's listening ear hears what's unspoken.",
+            "A mother's sensitive soul feels every emotion.",
+            "A mother's keen eye misses nothing.",
+            "A mother's gentle hand guides without forcing.",
+            "A mother's quiet strength speaks volumes.",
+            "A mother's constant presence provides security.",
+            "A mother's unwavering support builds dreams.",
+            "A mother's endless patience teaches tolerance.",
+            "A mother's deep love knows no conditions.",
+            "A mother's pure heart sees only good.",
+            "A mother's hopeful spirit inspires optimism.",
+            "A mother's faithful love never gives up.",
+            "A mother's joyful heart spreads happiness.",
+            "A mother's peaceful nature calms chaos.",
+            "A mother's kind words build self-esteem.",
+            "A mother's loving actions speak louder than words.",
+            "A mother's careful attention to detail shows she cares.",
+            "A mother's thoughtful gestures warm the heart.",
+            "A mother's sincere interest validates our feelings.",
+            "A mother's genuine concern shows in everything.",
+            "A mother's heartfelt affection fills us with confidence.",
+            "A mother's profound impact shapes generations.",
+            "A mother's lasting influence echoes through time.",
+            "A mother's powerful example sets the standard.",
+            "A mother's mighty love conquers all obstacles.",
+            "A mother's fierce protection keeps us safe.",
+            "A mother's brave heart faces any challenge.",
+            "A mother's bold spirit inspires courage.",
+            "A mother's strong will overcomes adversity.",
+            "A mother's determined effort never quits.",
+            "A mother's persistent love breaks down walls.",
+            "A mother's tireless work deserves recognition.",
+            "A mother's ceaseless dedication is awe-inspiring.",
+            "A mother's relentless pursuit of our happiness drives her.",
+            "A mother's steadfast commitment anchors the family.",
+            "A mother's loyal devotion is our foundation.",
+            "A mother's true love is our greatest blessing.",
+            "A mother's genuine care is irreplaceable.",
+            "A mother's real sacrifice often goes unnoticed.",
+            "A mother's actual worth is beyond measure.",
+            "A mother's complete acceptance lets us be ourselves.",
+            "A mother's total dedication shapes who we become.",
+            "A mother's full heart has room for everyone.",
+            "A mother's whole being is invested in her children.",
+            "A mother's entire world revolves around her family.",
+            "A mother's perfect love covers all imperfections.",
+            "A mother's absolute trust empowers us.",
+            "A mother's unconditional acceptance heals our wounds.",
+            "A mother's limitless patience teaches us perseverance.",
+            "A mother's boundless energy amazes everyone.",
+            "A mother's infinite wisdom guides us right.",
+            "A mother's eternal love transcends everything.",
+            "A mother's timeless beauty comes from within.",
+            "A mother's ageless spirit keeps her young.",
+            "A mother's immortal legacy lives in her children.",
+            "A mother's everlasting impact shapes the future.",
+            "A mother's perpetual hope keeps us going.",
+            "A mother's constant faith sustains us.",
+            "A mother's enduring strength carries us through.",
+            "A mother's lasting affection comforts us always.",
+            "A mother's permanent place in our hearts never fades.",
+            "A mother's fixed purpose is our wellbeing.",
+            "A mother's stable presence grounds us.",
+            "A mother's solid foundation supports our growth.",
+            "A mother's firm belief in us builds confidence.",
+            "A mother's sure guidance prevents mistakes.",
+            "A mother's certain love is our anchor.",
+            "A mother's definite commitment is unwavering.",
+            "A mother's positive attitude lifts our spirits.",
+            "A mother's confident manner inspires belief.",
+            "A mother's assured approach calms our fears.",
+            "A mother's secure embrace provides comfort.",
+            "A mother's safe haven is always open.",
+            "A mother's protected space lets us heal.",
+            "A mother's sheltered arms shield from harm.",
+            "A mother's guarded heart keeps our secrets.",
+            "A mother's defended position protects the family.",
+            "A mother's shielded love deflects negativity.",
+            "A mother's covered care blankets us warmly.",
+            "A mother's wrapped affection holds us close.",
+            "A mother's enfolded love surrounds completely.",
+            "A mother's embraced children feel cherished.",
+            "A mother's held hand provides guidance.",
+            "A mother's supported dreams become reality.",
+            "A mother's upheld values shape character.",
+            "A mother's maintained standards set expectations.",
+            "A mother's preserved traditions connect generations.",
+            "A mother's kept promises build trust.",
+            "A mother's sustained effort never wavers.",
+            "A mother's continued presence brings peace.",
+            "A mother's ongoing support empowers growth.",
+            "A mother's persistent belief drives achievement.",
+            "A mother's lasting impression shapes identity.",
+            "A mother's enduring patience teaches wisdom.",
+            "A mother's remaining love stays forever.",
+            "A mother's abiding faith sustains hope.",
+            "A mother's dwelling spirit lives within us.",
+            "A mother's residing love occupies our hearts.",
+            "A mother's living legacy continues on.",
+            "A mother's breathing presence feels real.",
+            "A mother's existing impact is undeniable.",
+            "A mother's present love is always felt.",
+            "A mother's current influence guides daily.",
+            "A mother's active participation shows commitment.",
+            "A mother's working dedication builds futures.",
+            "A mother's functioning role keeps order.",
+            "A mother's operating system runs the household.",
+            "A mother's running effort never stops.",
+            "A mother's going concern is everyone's welfare.",
+            "A mother's moving force propels progress.",
+            "A mother's driving passion fuels success.",
+            "A mother's pushing encouragement motivates achievement.",
+            "A mother's pulling strength lifts us up.",
+            "A mother's drawing power attracts goodness.",
+            "A mother's magnetic personality brings joy.",
+            "A mother's attractive nature inspires love.",
+            "A mother's appealing character wins hearts.",
+            "A mother's charming ways delight everyone.",
+            "A mother's engaging presence captivates attention.",
+            "A mother's fascinating stories create memories.",
+            "A mother's interesting life teaches lessons.",
+            "A mother's absorbing love holds us tight.",
+            "A mother's gripping care won't let go.",
+            "A mother's compelling force cannot be denied.",
+            "A mother's convincing argument always wins.",
+            "A mother's persuasive manner gets results.",
+            "A mother's influential voice shapes opinions.",
+            "A mother's effective methods work wonders.",
+            "A mother's successful approach achieves goals.",
+            "A mother's winning ways earn respect.",
+            "A mother's triumphant spirit celebrates victories.",
+            "A mother's conquering love overcomes obstacles.",
+            "A mother's defeating power crushes fears.",
+            "A mother's overcoming strength beats challenges.",
+            "A mother's prevailing will ensures success.",
+            "A mother's victorious heart claims triumph.",
+            "A mother's champion spirit fights for us.",
+            "A mother's warrior nature protects fiercely.",
+            "A mother's fighter instinct never surrenders.",
+            "A mother's defender role guards carefully.",
+            "A mother's protector stance shields constantly.",
+            "A mother's guardian watch never sleeps.",
+            "A mother's keeper role preserves precious things.",
+            "A mother's custodian duty safeguards futures.",
+            "A mother's caretaker heart nurtures growth.",
+            "A mother's nurturer soul feeds development.",
+            "A mother's provider hands give generously.",
+            "A mother's supplier effort ensures plenty.",
+            "A mother's giver nature shares freely.",
+            "A mother's donor heart contributes constantly.",
+            "A mother's benefactor role blesses abundantly.",
+            "A mother's patron support enables dreams.",
+            "A mother's sponsor backing makes possible.",
+            "A mother's backer presence provides confidence.",
+            "A mother's supporter role encourages always.",
+            "A mother's advocate voice speaks up.",
+            "A mother's champion cause defends rights.",
+            "A mother's promoter effort advances interests.",
+            "A mother's booster energy lifts spirits.",
+            "A mother's fan enthusiasm shows pride.",
+            "A mother's follower loyalty stands firm.",
+            "A mother's disciple learning never ends.",
+            "A mother's student mind stays curious.",
+            "A mother's learner heart grows wiser.",
+            "A mother's pupil eyes observe carefully.",
+            "A mother's apprentice hands work skillfully.",
+            "A mother's novice spirit stays humble.",
+            "A mother's beginner attitude welcomes change.",
+            "A mother's starter role initiates action.",
+            "A mother's pioneer spirit explores boldly.",
+            "A mother's trailblazer courage leads forward.",
+            "A mother's pathfinder wisdom finds the way.",
+            "A mother's guide knowledge shows the path.",
+            "A mother's leader strength inspires following.",
+            "A mother's director vision plans ahead.",
+            "A mother's manager skill organizes chaos.",
+            "A mother's administrator ability handles complexity.",
+            "A mother's supervisor watchfulness ensures safety.",
+            "A mother's overseer attention maintains quality.",
+            "A mother's monitor awareness catches everything.",
+            "A mother's observer eye sees all.",
+            "A mother's watcher vigilance protects always.",
+            "A mother's sentinel duty guards faithfully.",
+            "A mother's lookout position spots danger.",
+            "A mother's scout readiness prepares well.",
+            "A mother's explorer curiosity discovers joy.",
+            "A mother's adventurer spirit embraces life.",
+            "A mother's traveler heart journeys with us.",
+            "A mother's wanderer soul seeks goodness.",
+            "A mother's seeker mind finds answers.",
+            "A mother's searcher effort uncovers truth.",
+            "A mother's hunter instinct tracks success.",
+            "A mother's gatherer nature collects blessings.",
+            "A mother's collector heart treasures moments.",
+            "A mother's keeper soul preserves memories.",
+            "A mother's saver wisdom plans for tomorrow.",
+            "A mother's hoarder tendency keeps special things.",
+            "A mother's accumulator habit builds reserves.",
+            "A mother's amasser effort creates abundance.",
+            "A mother's compiler skill organizes information.",
+            "A mother's assembler talent puts pieces together.",
+            "A mother's builder hands construct futures.",
+            "A mother's maker heart creates beauty.",
+            "A mother's creator spirit imagines possibilities.",
+            "A mother's inventor mind solves problems.",
+            "A mother's designer eye sees potential.",
+            "A mother's architect plan builds foundations.",
+            "A mother's engineer skill constructs solutions.",
+            "A mother's craftsman hands work with care.",
+            "A mother's artisan touch adds beauty.",
+            "A mother's artist soul expresses love.",
+            "A mother's painter brush colors our world.",
+            "A mother's sculptor hands shape character.",
+            "A mother's potter fingers mold futures.",
+            "A mother's weaver skill connects threads.",
+            "A mother's seamstress care mends broken things.",
+            "A mother's tailor precision fits perfectly.",
+            "A mother's stitcher patience repairs patiently.",
+            "A mother's mender heart heals wounds.",
+            "A mother's fixer ability solves problems.",
+            "A mother's repairer skill restores wholeness.",
+            "A mother's renovator vision sees improvement.",
+            "A mother's restorer touch brings renewal.",
+            "A mother's healer hands provide comfort.",
+            "A mother's curer care brings wellness.",
+            "A mother's physician wisdom promotes health.",
+            "A mother's nurse attention tends carefully.",
+            "A mother's caregiver devotion serves lovingly.",
+            "A mother's attendant presence stays close.",
+            "A mother's aide hands help readily.",
+            "A mother's assistant effort supports fully."
+        ];
+
+        // Quote rotation system
+        let currentQuoteIndex = 0;
+        let usedQuotes = [];
+
+        // Load used quotes from localStorage
+        function loadUsedQuotes() {
+            const stored = localStorage.getItem('usedMotherQuotes');
+            if (stored) {
+                const data = JSON.parse(stored);
+                // Check if data is older than 30 days
+                const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+                if (data.timestamp > thirtyDaysAgo) {
+                    usedQuotes = data.quotes || [];
+                } else {
+                    // Reset if older than 30 days
+                    usedQuotes = [];
+                    localStorage.removeItem('usedMotherQuotes');
+                }
+            }
+        }
+
+        // Save used quotes to localStorage
+        function saveUsedQuotes() {
+            const data = {
+                quotes: usedQuotes,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('usedMotherQuotes', JSON.stringify(data));
+        }
+
+        // Get next quote (no repeats for 30 days)
+        function getNextQuote() {
+            loadUsedQuotes();
+            
+            // If all quotes have been used, reset
+            if (usedQuotes.length >= motherQuotes.length) {
+                usedQuotes = [];
+            }
+
+            // Find unused quotes
+            const unusedQuotes = motherQuotes.filter((quote, index) => !usedQuotes.includes(index));
+            
+            // Pick a random unused quote
+            const randomIndex = Math.floor(Math.random() * unusedQuotes.length);
+            const selectedQuote = unusedQuotes[randomIndex];
+            const originalIndex = motherQuotes.indexOf(selectedQuote);
+            
+            // Mark as used
+            usedQuotes.push(originalIndex);
+            saveUsedQuotes();
+            
+            return selectedQuote;
+        }
+
+        // Update quote display with fade effect
+        function updateQuote() {
+            const quoteElement = document.getElementById('quoteText');
+            
+            // Fade out
+            quoteElement.classList.add('quote-fade');
+            
+            setTimeout(() => {
+                // Change quote
+                quoteElement.textContent = `"${getNextQuote()}"`;
+                
+                // Fade in
+                quoteElement.classList.remove('quote-fade');
+            }, 500);
+        }
 
         // Prevent page refresh when timer is running
         window.addEventListener('beforeunload', function (e) {
@@ -368,6 +942,8 @@
                 return;
             }
 
+            const now = new Date();
+
             historyList.innerHTML = history.map(record => {
                 const date = new Date(record.timestamp);
                 const dateStr = date.toLocaleDateString('en-US', { 
@@ -381,9 +957,34 @@
                     minute: '2-digit'
                 });
                 
+                // Calculate time ago
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                let timeAgoText = '';
+                
+                if (diffMins < 1) {
+                    timeAgoText = 'Just now';
+                } else if (diffMins < 60) {
+                    timeAgoText = `${diffMins}m ago`;
+                } else if (diffMins < 1440) {
+                    const hours = Math.floor(diffMins / 60);
+                    const mins = diffMins % 60;
+                    if (mins === 0) {
+                        timeAgoText = `${hours}h ago`;
+                    } else {
+                        timeAgoText = `${hours}h ${mins}m ago`;
+                    }
+                } else {
+                    const days = Math.floor(diffMins / 1440);
+                    timeAgoText = `${days}d ago`;
+                }
+                
                 return `
                     <div class="history-item">
-                        <div class="history-date">${dateStr}</div>
+                        <div class="history-date">
+                            <span>${dateStr}</span>
+                            <span class="time-ago">${timeAgoText}</span>
+                        </div>
                         <div class="history-duration">${record.duration}</div>
                         <div class="history-time">Started at ${timeStr}</div>
                     </div>
@@ -470,7 +1071,7 @@
 
         function stopTimer() {
             // Show custom confirmation dialog
-            const userConfirmed = confirm('Are you sure you want to stop and save?\n\nPress OK to stop and save the feeding session.\nPress Cancel to continue feeding.');
+            const userConfirmed = confirm('Are you sure you want to stop the feeding timer?\n\nPress OK to stop the timer.\nPress Cancel to continue feeding.');
             
             if (userConfirmed) {
                 // User clicked OK/Yes - proceed with stopping
@@ -533,10 +1134,19 @@
 
         // Initialize history on load
         window.addEventListener('load', () => {
+            // Set initial quote
+            document.getElementById('quoteText').textContent = `"${getNextQuote()}"`;
+            
+            // Rotate quote every minute
+            setInterval(updateQuote, 60000);
+            
             displayHistory();
             updateLastFeedingTime();
-            // Update last feeding time every minute
-            setInterval(updateLastFeedingTime, 60000);
+            // Update last feeding time and history every minute
+            setInterval(() => {
+                updateLastFeedingTime();
+                displayHistory();
+            }, 60000);
         });
 
         // Calculate and display time since last feeding
@@ -577,4 +1187,3 @@
     </script>
 </body>
 </html>
-```
