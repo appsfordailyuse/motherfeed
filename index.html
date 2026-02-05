@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,6 +334,16 @@
         let totalDuration = 0;
         let pausedTime = 0;
 
+        // Prevent page refresh when timer is running
+        window.addEventListener('beforeunload', function (e) {
+            // Check if timer is running (startBtn is hidden means timer is active)
+            if (document.getElementById('startBtn').style.display === 'none') {
+                e.preventDefault();
+                e.returnValue = ''; // Chrome requires returnValue to be set
+                return ''; // For older browsers
+            }
+        });
+
         // Load history from localStorage
         function loadHistory() {
             const history = localStorage.getItem('feedingHistory');
@@ -459,9 +470,16 @@
         }
 
         function stopTimer() {
-            clearInterval(countdown);
-            saveSession(false); // Stopped manually
-            resetUI();
+            // Show custom confirmation dialog
+            const userConfirmed = confirm('Are you sure you want to stop and save?\n\nPress OK to stop and save the feeding session.\nPress Cancel to continue feeding.');
+            
+            if (userConfirmed) {
+                // User clicked OK/Yes - proceed with stopping
+                clearInterval(countdown);
+                saveSession(false); // Stopped manually
+                resetUI();
+            }
+            // If user clicked Cancel/No - do nothing, timer continues running
         }
 
         function saveSession(completed) {
@@ -543,7 +561,12 @@
                 timeAgoText = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
             } else if (diffMins < 1440) { // Less than 24 hours
                 const hours = Math.floor(diffMins / 60);
-                timeAgoText = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                const mins = diffMins % 60;
+                if (mins === 0) {
+                    timeAgoText = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                } else {
+                    timeAgoText = `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''} ago`;
+                }
             } else {
                 const days = Math.floor(diffMins / 1440);
                 timeAgoText = `${days} day${days > 1 ? 's' : ''} ago`;
@@ -555,3 +578,4 @@
     </script>
 </body>
 </html>
+```
