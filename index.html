@@ -53,6 +53,36 @@
             opacity: 0.9; 
         }
 
+        .allah-names-link {
+            font-size: 0.85rem;
+            color: #ff6b9d;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+            position: relative;
+            padding: 8px 15px;
+            border-radius: 15px;
+            background: rgba(255, 107, 157, 0.1);
+            border: 1px solid #ff6b9d;
+            transition: all 0.3s ease;
+            animation: neonGlow 2s ease-in-out infinite;
+        }
+
+        .allah-names-link:hover {
+            transform: scale(1.05);
+            background: rgba(255, 107, 157, 0.2);
+        }
+
+        @keyframes neonGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px #ff6b9d, 0 0 10px #ff6b9d, 0 0 15px rgba(100, 200, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 30px rgba(100, 200, 255, 0.8);
+            }
+        }
+
         .quote-section {
             margin: 15px 0 25px 0;
             padding: 15px 20px;
@@ -363,12 +393,145 @@
             background: var(--accent-color);
             border-radius: 10px;
         }
+
+        /* 99 Names of Allah Section */
+        .names-container {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            margin-bottom: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .names-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 40px;
+            background: linear-gradient(45deg, 
+                transparent 0%, 
+                transparent 40%,
+                rgba(162, 155, 254, 0.3) 50%,
+                transparent 60%,
+                transparent 100%
+            );
+            background-size: 200% 200%;
+            animation: revolveLight 8s linear infinite;
+            z-index: -1;
+            filter: blur(3px);
+        }
+
+        .names-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 40px;
+            border: 2px dotted var(--accent-color);
+            opacity: 0.4;
+            animation: rotateDots 12s linear infinite;
+        }
+
+        .names-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .names-header h2 {
+            font-weight: 300;
+            font-size: 1.3rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .names-list {
+            max-height: 500px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .name-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-right: 4px solid var(--accent-color);
+            text-align: right;
+            direction: rtl;
+        }
+
+        .name-arabic {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            font-family: 'Traditional Arabic', 'Arabic Typesetting', Arial, sans-serif;
+        }
+
+        .name-transliteration {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            direction: ltr;
+            text-align: left;
+            font-style: italic;
+        }
+
+        .name-urdu {
+            font-size: 1rem;
+            color: #74b9ff;
+            font-family: 'Jameel Noori Nastaleeq', 'Noto Nastalikh Urdu', 'Urdu Typesetting', Arial, sans-serif;
+        }
+
+        .name-number {
+            display: inline-block;
+            background: var(--accent-color);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            direction: ltr;
+        }
+
+        /* Custom Scrollbar for Names List */
+        .names-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .names-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .names-list::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body id="body">
 
     <div class="container">
         <h1>Mother Feeding App</h1>
+        
+        <div class="allah-names-link" onclick="document.getElementById('allahNames').scrollIntoView({behavior: 'smooth'})">📿 99 Names of ALLAH</div>
         
         <div class="quote-section">
             <div class="quote-text" id="quoteText">"A mother's love is the fuel that enables a normal human being to do the impossible."</div>
@@ -420,6 +583,510 @@
             <div class="no-history">No feeding records yet</div>
         </div>
         <button class="clear-history" onclick="clearHistory()" style="width: 100%; margin-top: 15px;">Clear All</button>
+    </div>
+
+    <!-- 99 Names of Allah Section -->
+    <div class="names-container" id="allahNames">
+        <div class="names-header">
+            <h2>🕌 99 Names of ALLAH</h2>
+        </div>
+        <div class="names-list" id="namesList">
+            <div class="name-item">
+                <div class="name-arabic">اللہ <span class="name-number">1</span></div>
+                <div class="name-transliteration">Allah</div>
+                <div class="name-urdu">اللہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الاحد <span class="name-number">2</span></div>
+                <div class="name-transliteration">Al-Ahad</div>
+                <div class="name-urdu">اکیلا، یکتا، تنہا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الاعلیٰ <span class="name-number">3</span></div>
+                <div class="name-transliteration">Al-A'lā</div>
+                <div class="name-urdu">بلندوبالا، اونچا، برتر</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الاکرم <span class="name-number">4</span></div>
+                <div class="name-transliteration">Al-Akram</div>
+                <div class="name-urdu">بہت زیادہ عزت والا، کرم والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الالٰہ <span class="name-number">5</span></div>
+                <div class="name-transliteration">Al-Ilāh</div>
+                <div class="name-urdu">عبادت اور محبت کے لائق</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الاول <span class="name-number">6</span></div>
+                <div class="name-transliteration">Al-Awwal</div>
+                <div class="name-urdu">سب سے پہلے وجود رکھنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الآخر <span class="name-number">7</span></div>
+                <div class="name-transliteration">Al-Ākhir</div>
+                <div class="name-urdu">سب کے بعد وجود رکھنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الظاہر <span class="name-number">8</span></div>
+                <div class="name-transliteration">Az-Zāhir</div>
+                <div class="name-urdu">سب سے ظاہر</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الباطن <span class="name-number">9</span></div>
+                <div class="name-transliteration">Al-Bātin</div>
+                <div class="name-urdu">سب سے پوشیدہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">البارئ <span class="name-number">10</span></div>
+                <div class="name-transliteration">Al-Bāri'</div>
+                <div class="name-urdu">جان ڈالنے والا، پیدا کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">البر <span class="name-number">11</span></div>
+                <div class="name-transliteration">Al-Barr</div>
+                <div class="name-urdu">بہت اچھا سلوک کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">البصیر <span class="name-number">12</span></div>
+                <div class="name-transliteration">Al-Basīr</div>
+                <div class="name-urdu">نہایت دیکھنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">التواب <span class="name-number">13</span></div>
+                <div class="name-transliteration">At-Tawwāb</div>
+                <div class="name-urdu">بہت زیادہ توبہ قبول کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الجبار <span class="name-number">14</span></div>
+                <div class="name-transliteration">Al-Jabbār</div>
+                <div class="name-urdu">اپنی مرضی چلانے والا، زبردست</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحافظ <span class="name-number">15</span></div>
+                <div class="name-transliteration">Al-Hāfiz</div>
+                <div class="name-urdu">حفاظت کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحسیب <span class="name-number">16</span></div>
+                <div class="name-transliteration">Al-Hasīb</div>
+                <div class="name-urdu">پورا حساب لینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحفیظ <span class="name-number">17</span></div>
+                <div class="name-transliteration">Al-Hafīz</div>
+                <div class="name-urdu">نہایت حفاظت کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحفی <span class="name-number">18</span></div>
+                <div class="name-transliteration">Al-Hafī</div>
+                <div class="name-urdu">بہت زیادہ مہربان</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحق <span class="name-number">19</span></div>
+                <div class="name-transliteration">Al-Haqq</div>
+                <div class="name-urdu">برحق، حق والا، سچا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المبین <span class="name-number">20</span></div>
+                <div class="name-transliteration">Al-Mubīn</div>
+                <div class="name-urdu">ظاہر کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحکیم <span class="name-number">21</span></div>
+                <div class="name-transliteration">Al-Hakīm</div>
+                <div class="name-urdu">نہایت حکمت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحلیم <span class="name-number">22</span></div>
+                <div class="name-transliteration">Al-Halīm</div>
+                <div class="name-urdu">نہایت برداشت کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحمید <span class="name-number">23</span></div>
+                <div class="name-transliteration">Al-Hamīd</div>
+                <div class="name-urdu">بے حد تعریف والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحی <span class="name-number">24</span></div>
+                <div class="name-transliteration">Al-Hayy</div>
+                <div class="name-urdu">خود زندہ، زندگی دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القیوم <span class="name-number">25</span></div>
+                <div class="name-transliteration">Al-Qayyūm</div>
+                <div class="name-urdu">خود قائم، قائم رکھنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الخبیر <span class="name-number">26</span></div>
+                <div class="name-transliteration">Al-Khabīr</div>
+                <div class="name-urdu">بہت زیادہ باخبر</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الخالق <span class="name-number">27</span></div>
+                <div class="name-transliteration">Al-Khāliq</div>
+                <div class="name-urdu">پیدا کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الخلاق <span class="name-number">28</span></div>
+                <div class="name-transliteration">Al-Khallāq</div>
+                <div class="name-urdu">بہت پیدا کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرؤوف <span class="name-number">29</span></div>
+                <div class="name-transliteration">Ar-Ra'ūf</div>
+                <div class="name-urdu">بہت زیادہ شفقت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرحمن <span class="name-number">30</span></div>
+                <div class="name-transliteration">Ar-Rahmān</div>
+                <div class="name-urdu">بہت رحم کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرحیم <span class="name-number">31</span></div>
+                <div class="name-transliteration">Ar-Rahīm</div>
+                <div class="name-urdu">ہمیشہ رحم کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرزاق <span class="name-number">32</span></div>
+                <div class="name-transliteration">Ar-Razzāq</div>
+                <div class="name-urdu">بہت رزق دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرقیب <span class="name-number">33</span></div>
+                <div class="name-transliteration">Ar-Raqīb</div>
+                <div class="name-urdu">پورا نگہبان، نگران</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">السلام <span class="name-number">34</span></div>
+                <div class="name-transliteration">As-Salām</div>
+                <div class="name-urdu">سراسر سلامتی</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">السمیع <span class="name-number">35</span></div>
+                <div class="name-transliteration">As-Samī'</div>
+                <div class="name-urdu">بہت زیادہ سننے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الشاکر <span class="name-number">36</span></div>
+                <div class="name-transliteration">Ash-Shākir</div>
+                <div class="name-urdu">قدردان</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الشکور <span class="name-number">37</span></div>
+                <div class="name-transliteration">Ash-Shakūr</div>
+                <div class="name-urdu">بہت زیادہ قدردان</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الشہید <span class="name-number">38</span></div>
+                <div class="name-transliteration">Ash-Shaheed</div>
+                <div class="name-urdu">گواہ، اطلاع رکھنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الصمد <span class="name-number">39</span></div>
+                <div class="name-transliteration">As-Samad</div>
+                <div class="name-urdu">بے عیب، بے نیاز، داتا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العالم <span class="name-number">40</span></div>
+                <div class="name-transliteration">Al-'Ālim</div>
+                <div class="name-urdu">ہر چیز کو جاننے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العزیز <span class="name-number">41</span></div>
+                <div class="name-transliteration">Al-'Azīz</div>
+                <div class="name-urdu">نہایت غلبے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العظیم <span class="name-number">42</span></div>
+                <div class="name-transliteration">Al-'Azīm</div>
+                <div class="name-urdu">نہایت عظمت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العفو <span class="name-number">43</span></div>
+                <div class="name-transliteration">Al-'Afūw</div>
+                <div class="name-urdu">نہایت درگزر کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العلیم <span class="name-number">44</span></div>
+                <div class="name-transliteration">Al-'Alīm</div>
+                <div class="name-urdu">بہت زیادہ علم والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">العلی <span class="name-number">45</span></div>
+                <div class="name-transliteration">Al-'Aliyy</div>
+                <div class="name-urdu">نہایت بلندی والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الغفار <span class="name-number">46</span></div>
+                <div class="name-transliteration">Al-Ghaffār</div>
+                <div class="name-urdu">بہت معاف کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الغفور <span class="name-number">47</span></div>
+                <div class="name-transliteration">Al-Ghafūr</div>
+                <div class="name-urdu">ہمیشہ معاف کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الغنی <span class="name-number">48</span></div>
+                <div class="name-transliteration">Al-Ghaniyy</div>
+                <div class="name-urdu">بڑا بے پروا، بے نیاز</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الفتاح <span class="name-number">49</span></div>
+                <div class="name-transliteration">Al-Fattāh</div>
+                <div class="name-urdu">بہت زیادہ کھولنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القادر <span class="name-number">50</span></div>
+                <div class="name-transliteration">Al-Qādir</div>
+                <div class="name-urdu">قدرت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القاہر <span class="name-number">51</span></div>
+                <div class="name-transliteration">Al-Qāhir</div>
+                <div class="name-urdu">غلبے والا، طاقتور</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القدوس <span class="name-number">52</span></div>
+                <div class="name-transliteration">Al-Quddūs</div>
+                <div class="name-urdu">نہایت پاک</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القریب <span class="name-number">53</span></div>
+                <div class="name-transliteration">Al-Qarīb</div>
+                <div class="name-urdu">حد درجہ قریب، نزدیک</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القوی <span class="name-number">54</span></div>
+                <div class="name-transliteration">Al-Qawiyy</div>
+                <div class="name-urdu">نہایت قوت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القدیر <span class="name-number">55</span></div>
+                <div class="name-transliteration">Al-Qadīr</div>
+                <div class="name-urdu">نہایت قدرت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القہار <span class="name-number">56</span></div>
+                <div class="name-transliteration">Al-Qahhār</div>
+                <div class="name-urdu">بڑا زبردست طاقتور</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الکبیر <span class="name-number">57</span></div>
+                <div class="name-transliteration">Al-Kabīr</div>
+                <div class="name-urdu">نہایت بڑائی والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الکریم <span class="name-number">58</span></div>
+                <div class="name-transliteration">Al-Karīm</div>
+                <div class="name-urdu">بہت زیادہ کرم والا، سخنی</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">اللطیف <span class="name-number">59</span></div>
+                <div class="name-transliteration">Al-Latīf</div>
+                <div class="name-urdu">باریک بین، نرمی کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المؤمن <span class="name-number">60</span></div>
+                <div class="name-transliteration">Al-Mu'min</div>
+                <div class="name-urdu">امن دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المتعالی <span class="name-number">61</span></div>
+                <div class="name-transliteration">Al-Muta'ālī</div>
+                <div class="name-urdu">نہایت بلند</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المتکبر <span class="name-number">62</span></div>
+                <div class="name-transliteration">Al-Mutakabbir</div>
+                <div class="name-urdu">بڑائی والا، تکبر والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المتین <span class="name-number">63</span></div>
+                <div class="name-transliteration">Al-Matīn</div>
+                <div class="name-urdu">نہایت مضبوط قوت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المجیب <span class="name-number">64</span></div>
+                <div class="name-transliteration">Al-Mujīb</div>
+                <div class="name-urdu">قبول کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المجید <span class="name-number">65</span></div>
+                <div class="name-transliteration">Al-Majīd</div>
+                <div class="name-urdu">نہایت بزرگی، شان والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المحیط <span class="name-number">66</span></div>
+                <div class="name-transliteration">Al-Muhīt</div>
+                <div class="name-urdu">احاطہ کرنے والا، گھیرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المصور <span class="name-number">67</span></div>
+                <div class="name-transliteration">Al-Musawwir</div>
+                <div class="name-urdu">شکل بنانے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المقتدر <span class="name-number">68</span></div>
+                <div class="name-transliteration">Al-Muqtadir</div>
+                <div class="name-urdu">نہایت قدرت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المقیت <span class="name-number">69</span></div>
+                <div class="name-transliteration">Al-Muqīt</div>
+                <div class="name-urdu">نگرانی کرنے والا، روزی دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الملک <span class="name-number">70</span></div>
+                <div class="name-transliteration">Al-Malik</div>
+                <div class="name-urdu">بادشاہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المالک <span class="name-number">71</span></div>
+                <div class="name-transliteration">Al-Malīk</div>
+                <div class="name-urdu">عظیم بادشاہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المولیٰ <span class="name-number">72</span></div>
+                <div class="name-transliteration">Al-Mawlā</div>
+                <div class="name-urdu">مالک، آقا، مددگار</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المہیمن <span class="name-number">73</span></div>
+                <div class="name-transliteration">Al-Muhaymin</div>
+                <div class="name-urdu">پورا نگران</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">النصیر <span class="name-number">74</span></div>
+                <div class="name-transliteration">An-Nasīr</div>
+                <div class="name-urdu">نہایت مددگار</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الواحد <span class="name-number">75</span></div>
+                <div class="name-transliteration">Al-Wāhid</div>
+                <div class="name-urdu">ایک، اکیلا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الوارث <span class="name-number">76</span></div>
+                <div class="name-transliteration">Al-Wārith</div>
+                <div class="name-urdu">وارث، اصلی مالک</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الواسع <span class="name-number">77</span></div>
+                <div class="name-transliteration">Al-Wāsi'</div>
+                <div class="name-urdu">وسعت والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الودود <span class="name-number">78</span></div>
+                <div class="name-transliteration">Al-Wadūd</div>
+                <div class="name-urdu">نہایت پیار کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الوکیل <span class="name-number">79</span></div>
+                <div class="name-transliteration">Al-Wakīl</div>
+                <div class="name-urdu">اچھا کارساز</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الولی <span class="name-number">80</span></div>
+                <div class="name-transliteration">Al-Waliyy</div>
+                <div class="name-urdu">دوست، مددگار</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الوہاب <span class="name-number">81</span></div>
+                <div class="name-transliteration">Al-Wahhāb</div>
+                <div class="name-urdu">بہت زیادہ دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الجمیل <span class="name-number">82</span></div>
+                <div class="name-transliteration">Al-Jamīl</div>
+                <div class="name-urdu">نہایت خوبصورت</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الجواد <span class="name-number">83</span></div>
+                <div class="name-transliteration">Al-Jawād</div>
+                <div class="name-urdu">نہایت سخی، فیاض</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحکم <span class="name-number">84</span></div>
+                <div class="name-transliteration">Al-Hakam</div>
+                <div class="name-urdu">فیصلہ کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الحیی <span class="name-number">85</span></div>
+                <div class="name-transliteration">Al-Hammī</div>
+                <div class="name-urdu">نہایت حیاء والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرب <span class="name-number">86</span></div>
+                <div class="name-transliteration">Ar-Rabb</div>
+                <div class="name-urdu">پرورش کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الرفیق <span class="name-number">87</span></div>
+                <div class="name-transliteration">Ar-Rafīq</div>
+                <div class="name-urdu">نہایت نرمی والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">السبوح <span class="name-number">88</span></div>
+                <div class="name-transliteration">As-Subūh</div>
+                <div class="name-urdu">نہایت پاکیزہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">السید <span class="name-number">89</span></div>
+                <div class="name-transliteration">As-Sayyid</div>
+                <div class="name-urdu">سردار، بادشاہ، آقا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الشافی <span class="name-number">90</span></div>
+                <div class="name-transliteration">Ash-Shānī</div>
+                <div class="name-urdu">شفا دینے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الطیب <span class="name-number">91</span></div>
+                <div class="name-transliteration">At-Tayyib</div>
+                <div class="name-urdu">پاک، پاکیزہ</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">القابض <span class="name-number">92</span></div>
+                <div class="name-transliteration">Al-Qābid</div>
+                <div class="name-urdu">قبضے والا، کنٹرول کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الباسط <span class="name-number">93</span></div>
+                <div class="name-transliteration">Al-Bāsit</div>
+                <div class="name-urdu">کھولنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المقدم <span class="name-number">94</span></div>
+                <div class="name-transliteration">Al-Muqaddim</div>
+                <div class="name-urdu">آگے کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المؤخر <span class="name-number">95</span></div>
+                <div class="name-transliteration">Al-Mu'akhkhir</div>
+                <div class="name-urdu">پیچھے کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المحسن <span class="name-number">96</span></div>
+                <div class="name-transliteration">Al-Muhsin</div>
+                <div class="name-urdu">احسان کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المعطی <span class="name-number">97</span></div>
+                <div class="name-transliteration">Al-Mu'tī</div>
+                <div class="name-urdu">عطا کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">المنان <span class="name-number">98</span></div>
+                <div class="name-transliteration">Al-Mannān</div>
+                <div class="name-urdu">بہت زیادہ احسان کرنے والا</div>
+            </div>
+            <div class="name-item">
+                <div class="name-arabic">الوتر <span class="name-number">99</span></div>
+                <div class="name-transliteration">Al-Witr</div>
+                <div class="name-urdu">وتر، یکتا، اکیلا</div>
+            </div>
+        </div>
     </div>
 
     <div class="credits"><a href="https://www.facebook.com/samibajwaisking" target="_blank" style="color: inherit; text-decoration: none;">By: SamiBajwa</a></div>
