@@ -2,1681 +2,1417 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Mother Feeding App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121212;
-            --accent-color: #a29bfe;
-            --text-color: #f1f1f1;
+            --bg: #0d0d14;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.07);
+            --border: rgba(255,255,255,0.08);
+            --accent: #c8a2c8;
+            --accent2: #f0c4d4;
+            --gold: #e8c97a;
+            --text: #f0eaf5;
+            --text-muted: rgba(240,234,245,0.55);
+            --danger: #ff6b8a;
+            --success: #7de8b5;
+            --warn: #f7c96e;
+            --radius: 24px;
+            --radius-sm: 14px;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 10%, rgba(200,162,200,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 50% at 80% 80%, rgba(240,196,212,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 30% at 50% 50%, rgba(232,201,122,0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrap {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Header ── */
+        .app-header {
+            text-align: center;
+            padding: 32px 0 24px;
+        }
+
+        .app-header .logo-icon {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(200,162,200,0.5));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .app-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.02em;
+            margin-bottom: 4px;
+        }
+
+        .app-header .subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 20px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,162,200,0.4), transparent);
+        }
+
+        /* ── Quote Card ── */
+        .quote-card {
+            padding: 18px 20px;
+            margin-bottom: 14px;
+        }
+
+        .quote-inner {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .quote-mark {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            line-height: 1;
+            color: var(--accent);
+            opacity: 0.4;
+            flex-shrink: 0;
+            margin-top: -6px;
+        }
+
+        #quoteText {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: var(--accent2);
+            opacity: 0.9;
+            transition: opacity 0.5s ease;
+        }
+
+        #quoteText.fade { opacity: 0; }
+
+        /* ── 99 Names Pill ── */
+        .names-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(232,201,122,0.08);
+            border: 1px solid rgba(232,201,122,0.25);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: var(--gold);
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            width: 100%;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            animation: goldPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes goldPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(232,201,122,0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(232,201,122,0); }
+        }
+
+        .names-pill:hover {
+            background: rgba(232,201,122,0.15);
+            transform: translateY(-1px);
+        }
+
+        /* ── Age Selector ── */
+        .section-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            padding: 13px 40px 13px 16px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23c8a2c8' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            transition: border-color 0.3s;
+        }
+
+        select:focus { border-color: var(--accent); }
+        select option { background: #1a1a28; }
+
+        /* ── Timer Section ── */
+        .timer-core {
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        .timer-status {
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .timer-status.running { color: var(--success); }
+        .timer-status.paused { color: var(--warn); }
+        .timer-status.complete { color: var(--accent2); }
+
+        .timer-ring-wrap {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .timer-ring-wrap svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .ring-track {
+            fill: none;
+            stroke: rgba(255,255,255,0.06);
+            stroke-width: 6;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 565;
+            transition: stroke-dashoffset 1s linear, stroke 0.5s;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .ring-progress.paused { stroke: var(--warn); filter: drop-shadow(0 0 8px var(--warn)); }
+        .ring-progress.complete { stroke: var(--success); filter: drop-shadow(0 0 8px var(--success)); }
+
+        .timer-center {
+            position: absolute;
+            inset: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            transition: background 1.5s ease;
-            overflow-x: hidden;
-            padding: 20px;
-        }
-
-        .container {
-            text-align: center;
-            z-index: 10;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        h1 { 
-            font-weight: 300; 
-            margin-bottom: 20px; 
-            letter-spacing: 1px; 
-            font-size: 1.5rem; 
-            opacity: 0.9; 
-        }
-
-        .allah-names-link {
-            font-size: 0.85rem;
-            color: #ff6b9d;
-            cursor: pointer;
-            text-decoration: none;
-            margin-bottom: 20px;
-            display: inline-block;
-            position: relative;
-            padding: 8px 15px;
-            border-radius: 15px;
-            background: rgba(255, 107, 157, 0.1);
-            border: 1px solid #ff6b9d;
-            transition: all 0.3s ease;
-            animation: neonGlow 2s ease-in-out infinite;
-        }
-
-        .allah-names-link:hover {
-            transform: scale(1.05);
-            background: rgba(255, 107, 157, 0.2);
-        }
-
-        @keyframes neonGlow {
-            0%, 100% {
-                box-shadow: 0 0 5px #ff6b9d, 0 0 10px #ff6b9d, 0 0 15px rgba(100, 200, 255, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 30px rgba(100, 200, 255, 0.8);
-            }
-        }
-
-        .quote-section {
-            margin: 15px 0 25px 0;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border-left: 4px solid var(--accent-color);
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .quote-section::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 20px;
-            background: linear-gradient(45deg, 
-                transparent 0%, 
-                transparent 40%,
-                rgba(162, 155, 254, 0.3) 50%,
-                transparent 60%,
-                transparent 100%
-            );
-            background-size: 200% 200%;
-            animation: revolveLight 8s linear infinite;
-            z-index: -1;
-            filter: blur(3px);
-        }
-
-        .quote-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 20px;
-            border: 2px dotted var(--accent-color);
-            opacity: 0.4;
-            animation: rotateDots 12s linear infinite;
-        }
-
-        @keyframes revolveLight {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        @keyframes rotateDots {
-            0% {
-                transform: rotate(0deg);
-                opacity: 0.3;
-            }
-            50% {
-                opacity: 0.5;
-            }
-            100% {
-                transform: rotate(360deg);
-                opacity: 0.3;
-            }
-        }
-
-        .quote-text {
-            font-size: 0.9rem;
-            font-style: italic;
-            color: var(--accent-color);
-            line-height: 1.5;
-            text-align: center;
-            opacity: 0.95;
-            transition: opacity 0.5s ease;
-        }
-
-        .quote-fade {
-            opacity: 0;
-        }
-
-        /* Age Selector Styles */
-        .age-selector {
-            margin-bottom: 20px;
-        }
-
-        .age-selector label {
-            display: block;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            opacity: 0.8;
-            letter-spacing: 0.5px;
-        }
-
-        select {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid var(--accent-color);
-            border-radius: 20px;
-            color: white;
-            font-size: 1rem;
-            padding: 12px 20px;
-            width: 100%;
-            outline: none;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a29bfe' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 40px;
-        }
-
-        select option {
-            background: #1e1e1e;
-            color: white;
-            padding: 10px;
-        }
-
-        input[type="number"] {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid var(--accent-color);
-            border-radius: 20px;
-            color: white;
-            font-size: 3.5rem;
-            width: 140px;
-            text-align: center;
-            margin-bottom: 25px;
-            outline: none;
-            padding: 10px;
-        }
-
-        button {
-            padding: 18px 40px;
-            border-radius: 50px;
-            border: none;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.3s;
-            background: var(--accent-color);
-            color: #000;
-            font-weight: 600;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        button:active { transform: scale(0.98); }
-        button.stop { background: #ff7675; color: white; }
-        button.pause { background: #fdcb6e; color: #000; }
-        button.resume { background: #55efc4; color: #000; }
-
-        .theme-selector {
-            margin-top: 35px;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .color-dot {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.5);
-            transition: 0.3s;
-        }
-
-        .color-dot:hover { transform: scale(1.1); border-color: white; }
-
-        .vibration-toggle {
-            margin-top: 25px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            opacity: 0.8;
-        }
-
-        .credits {
-            position: fixed;
-            bottom: 20px;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            opacity: 0.5;
-            text-transform: uppercase;
-        }
-
-        @keyframes breathe {
-            0% { background-color: var(--bg-color); }
-            50% { background-color: var(--accent-color); }
-            100% { background-color: var(--bg-color); }
-        }
-
-        .blinking-active {
-            animation: breathe 4s infinite ease-in-out;
         }
 
         .timer-display {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--accent-color);
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .status-display {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* History Section */
-        .history-container {
-            width: 100%;
-            max-width: 380px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px 30px;
-            margin-bottom: 80px;
-        }
-
-        .history-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .history-header h2 {
-            font-weight: 300;
-            font-size: 1.3rem;
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .clear-history {
-            background: rgba(255, 118, 117, 0.2);
-            color: #ff7675;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: 1px solid #ff7675;
-            transition: 0.3s;
-        }
-
-        .clear-history:hover {
-            background: #ff7675;
-            color: white;
-        }
-
-        .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--accent-color);
-            text-align: left;
-        }
-
-        .history-date {
-            font-size: 0.85rem;
-            opacity: 0.7;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .time-ago {
-            color: #55efc4;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .history-duration {
-            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 600;
-            color: var(--accent-color);
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1;
         }
 
-        .history-time {
-            font-size: 0.9rem;
-            margin-top: 5px;
-            color: #ff6b6b;
-            font-weight: 500;
-        }
-
-        .no-history {
+        .timer-input {
+            background: none;
+            border: none;
+            outline: none;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            width: 120px;
             text-align: center;
-            opacity: 0.5;
-            padding: 40px 20px;
-            font-size: 0.95rem;
+            line-height: 1;
         }
 
-        .paused-indicator {
-            color: #fdcb6e;
+        /* hide number spinners */
+        .timer-input::-webkit-outer-spin-button,
+        .timer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .timer-input[type=number] { -moz-appearance: textfield; }
+
+        .timer-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* ── Buttons ── */
+        .btn-row {
+            display: grid;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-row.single { grid-template-columns: 1fr; }
+        .btn-row.two { grid-template-columns: 1fr 1fr; }
+
+        .btn {
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
             font-size: 0.9rem;
-            margin-top: 10px;
-            opacity: 0.8;
-        }
-
-        .last-feeding {
-            font-size: 0.85rem;
-            color: #74b9ff;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background: rgba(116, 185, 255, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(116, 185, 255, 0.3);
-        }
-
-        .last-feeding-time {
             font-weight: 600;
-            color: #ff6b6b;
-        }
-
-        /* Custom Scrollbar */
-        .history-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .history-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .history-list::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 10px;
-        }
-
-        /* 99 Names of Allah Section */
-        .names-container {
-            width: 100%;
-            max-width: 380px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px 30px;
-            margin-bottom: 80px;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: all 0.25s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .names-container::before {
+        .btn::after {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 40px;
-            background: linear-gradient(45deg, 
-                transparent 0%, 
-                transparent 40%,
-                rgba(162, 155, 254, 0.3) 50%,
-                transparent 60%,
-                transparent 100%
-            );
-            background-size: 200% 200%;
-            animation: revolveLight 8s linear infinite;
-            z-index: -1;
-            filter: blur(3px);
+            inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background 0.2s;
         }
 
-        .names-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 40px;
-            border: 2px dotted var(--accent-color);
-            opacity: 0.4;
-            animation: rotateDots 12s linear infinite;
+        .btn:active::after { background: rgba(255,255,255,0.1); }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            color: #1a0a1a;
+            box-shadow: 0 4px 24px rgba(200,162,200,0.35);
         }
 
-        .names-header {
-            display: flex;
+        .btn-primary:hover { box-shadow: 0 6px 32px rgba(200,162,200,0.5); transform: translateY(-1px); }
+
+        .btn-stop {
+            background: rgba(255,107,138,0.15);
+            border: 1px solid rgba(255,107,138,0.3);
+            color: var(--danger);
+        }
+
+        .btn-stop:hover { background: rgba(255,107,138,0.25); }
+
+        .btn-pause {
+            background: rgba(247,201,110,0.15);
+            border: 1px solid rgba(247,201,110,0.3);
+            color: var(--warn);
+        }
+
+        .btn-pause:hover { background: rgba(247,201,110,0.25); }
+
+        .btn-resume {
+            background: rgba(125,232,181,0.15);
+            border: 1px solid rgba(125,232,181,0.3);
+            color: var(--success);
+        }
+
+        .btn-resume:hover { background: rgba(125,232,181,0.25); }
+
+        .btn[style*="display:none"], .btn[style*="display: none"] { display: none !important; }
+
+        /* ── Last Feeding ── */
+        .last-feeding-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(116,185,255,0.08);
+            border: 1px solid rgba(116,185,255,0.2);
+            border-radius: var(--radius-sm);
+            margin-top: 14px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .last-feeding-bar.visible { display: flex; }
+        .last-feeding-bar .lf-dot { width: 8px; height: 8px; border-radius: 50%; background: #74b9ff; flex-shrink: 0; }
+        .last-feeding-bar .lf-time { color: #74b9ff; font-weight: 600; }
+
+        /* Paused tag */
+        .paused-tag {
+            display: none;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--warn);
+            padding: 6px 0 2px;
+            font-weight: 500;
         }
 
-        .names-header h2 {
-            font-weight: 300;
-            font-size: 1.3rem;
-            margin: 0;
-            opacity: 0.9;
+        .paused-tag.visible { display: flex; }
+
+        /* ── Vibration Toggle ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
         }
 
-        .names-list {
-            max-height: 500px;
-            overflow-y: auto;
+        .toggle-label { font-size: 0.88rem; color: var(--text-muted); font-weight: 400; }
+
+        .toggle-switch {
             position: relative;
-            z-index: 1;
+            width: 44px;
+            height: 24px;
         }
+
+        .toggle-switch input { display: none; }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider { background: rgba(200,162,200,0.35); }
+        .toggle-switch input:checked + .toggle-slider::after { transform: translateX(20px); background: var(--accent); }
+
+        /* ── Theme Dots ── */
+        .theme-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+        }
+
+        .theme-label { font-size: 0.78rem; color: var(--text-muted); margin-right: 2px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .dot-wrap { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .color-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: 0.25s;
+            flex-shrink: 0;
+        }
+
+        .color-dot:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.5); }
+        .color-dot.active { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+
+        /* ── History ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text);
+        }
+
+        .btn-clear {
+            font-size: 0.75rem;
+            color: var(--danger);
+            background: rgba(255,107,138,0.1);
+            border: 1px solid rgba(255,107,138,0.25);
+            padding: 5px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            transition: 0.25s;
+        }
+
+        .btn-clear:hover { background: rgba(255,107,138,0.22); }
+
+        .history-list { max-height: 420px; overflow-y: auto; }
+
+        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar-track { background: transparent; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .h-item {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .h-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .h-date { font-size: 0.78rem; color: var(--text-muted); }
+        .h-ago { font-size: 0.75rem; color: var(--success); font-weight: 600; }
+        .h-duration { font-size: 1.05rem; font-weight: 600; color: var(--accent); }
+        .h-ended { font-size: 0.78rem; color: var(--danger); margin-top: 2px; }
+
+        .no-history {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .no-history-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; opacity: 0.4; }
+
+        /* ── 99 Names ── */
+        .names-card { margin-bottom: 14px; }
+
+        .names-search {
+            width: 100%;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            padding: 11px 16px;
+            outline: none;
+            margin-bottom: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .names-search::placeholder { color: var(--text-muted); }
+        .names-search:focus { border-color: var(--accent); }
+
+        .names-list { max-height: 520px; overflow-y: auto; }
+
+        .names-list::-webkit-scrollbar { width: 4px; }
+        .names-list::-webkit-scrollbar-track { background: transparent; }
+        .names-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         .name-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-right: 4px solid var(--accent-color);
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            border-right: 3px solid var(--accent);
             text-align: right;
             direction: rtl;
         }
 
-        .name-arabic {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-            font-family: 'Traditional Arabic', 'Arabic Typesetting', Arial, sans-serif;
+        .name-num {
+            display: inline-block;
+            background: rgba(200,162,200,0.2);
+            color: var(--accent);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            margin-left: 6px;
+            direction: ltr;
+            letter-spacing: 0.05em;
         }
 
-        .name-transliteration {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
+        .name-arabic {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .name-trans {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
             direction: ltr;
             text-align: left;
-            font-style: italic;
+            margin-bottom: 3px;
         }
 
         .name-urdu {
-            font-size: 1rem;
-            color: #74b9ff;
-            font-family: 'Jameel Noori Nastaleeq', 'Noto Nastalikh Urdu', 'Urdu Typesetting', Arial, sans-serif;
+            font-size: 0.95rem;
+            color: #a0c8f8;
+            font-family: 'Noto Nastaliq Urdu', 'Traditional Arabic', Arial, sans-serif;
         }
 
-        .name-number {
-            display: inline-block;
-            background: var(--accent-color);
-            color: #000;
-            font-size: 0.75rem;
+        /* ── Footer ── */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 12px 20px;
+            background: transparent;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .footer a {
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover { color: var(--accent); }
+
+        /* ── One-time 5s color flash alarm ── */
+        @keyframes flashAlarm {
+            0%   { background-color: var(--bg); }
+            15%  { background-color: #2d0a3a; }
+            30%  { background-color: #0a2d1a; }
+            45%  { background-color: #2d1a00; }
+            60%  { background-color: #1a002d; }
+            75%  { background-color: #002d2a; }
+            90%  { background-color: #2d1500; }
+            100% { background-color: var(--bg); }
+        }
+
+        body.alarm-active { animation: flashAlarm 5s ease-in-out forwards; }
+
+        /* ── Custom Alert Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            animation: modalFadeIn 0.4s ease forwards;
+        }
+
+        @keyframes modalFadeIn {
+            to { opacity: 1; }
+        }
+
+        .modal-box {
+            background: #16101f;
+            border: 1px solid rgba(200,162,200,0.25);
+            border-radius: 28px;
+            padding: 32px 24px 24px;
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.85);
+            animation: modalPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+
+        @keyframes modalPop {
+            to { transform: scale(1); }
+        }
+
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,162,200,0.5), transparent);
+            border-radius: 28px 28px 0 0;
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 14px;
+            animation: modalIconBounce 0.6s ease 0.3s both;
+        }
+
+        @keyframes modalIconBounce {
+            0%   { transform: scale(0); }
+            60%  { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 10px;
-            margin-left: 8px;
-            direction: ltr;
+            background: linear-gradient(135deg, #f0c4d4, #c8a2c8, #e8c97a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
         }
 
-        /* Custom Scrollbar for Names List */
-        .names-list::-webkit-scrollbar {
-            width: 6px;
+        .modal-msg {
+            font-size: 0.92rem;
+            color: rgba(240,234,245,0.7);
+            line-height: 1.6;
+            margin-bottom: 8px;
         }
 
-        .names-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        .modal-urdu {
+            font-family: 'Noto Nastaliq Urdu', 'Traditional Arabic', Arial, sans-serif;
+            font-size: 1.05rem;
+            color: #c8a2c8;
+            direction: rtl;
+            margin-bottom: 24px;
+            line-height: 1.8;
         }
 
-        .names-list::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 10px;
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #c8a2c8, #f0c4d4);
+            color: #1a0a1a;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: 0.25s;
+            box-shadow: 0 4px 20px rgba(200,162,200,0.35);
+        }
+
+        .modal-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(200,162,200,0.5); }
+        .modal-btn:active { transform: scale(0.97); }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0 16px;
+        }
+
+        /* responsive tweaks */
+        @media (max-width: 360px) {
+            .timer-display, .timer-input { font-size: 2.4rem; }
+            .timer-ring-wrap { width: 170px; height: 170px; }
         }
     </style>
 </head>
 <body id="body">
+<div class="page-wrap">
 
-    <div class="container">
+    <!-- Header -->
+    <div class="app-header">
         <h1>Mother Feeding App</h1>
-        
-        <div class="allah-names-link" onclick="document.getElementById('allahNames').scrollIntoView({behavior: 'smooth'})">📿 99 Names of ALLAH</div>
-        
-        <div class="quote-section">
-            <div class="quote-text" id="quoteText">"A mother's love is the fuel that enables a normal human being to do the impossible."</div>
-        </div>
-        
-        <div id="timer-ui">
-            <div class="status-display" id="status">Ready to Start</div>
-            <div class="timer-display" id="display">0:00</div>
-            <input type="number" id="minutes" value="20" min="1" max="120">
-            
-            <div class="controls">
-                <button id="startBtn" onclick="startTimer()">Start Timer</button>
-                <button id="pauseBtn" class="pause" onclick="pauseTimer()" style="display:none;">Pause</button>
-                <button id="resumeBtn" class="resume" onclick="resumeTimer()" style="display:none;">Resume</button>
-                <button id="stopBtn" class="stop" onclick="stopTimer()" style="display:none;">Stop</button>
-            </div>
-            
-            <div class="paused-indicator" id="pausedIndicator" style="display:none;">
-                ⏸ Timer Paused
-            </div>
-            
-            <div class="last-feeding" id="lastFeeding" style="display:none;">
-                Last feeding: <span class="last-feeding-time" id="lastFeedingTime"></span>
-            </div>
-        </div>
+        <p class="subtitle">Track · Nurture · Remember</p>
+    </div>
 
-        <div class="vibration-toggle">
-            <input type="checkbox" id="vibrateSync" checked> 
-            <label for="vibrateSync">Vibration Alert</label>
+    <!-- Quote -->
+    <div class="card quote-card">
+        <div class="quote-inner">
+            <span class="quote-mark">"</span>
+            <p id="quoteText"></p>
         </div>
+    </div>
+
+    <!-- 99 Names Pill -->
+    <button class="names-pill" onclick="scrollToNames()">
+        📿 99 Names of ALLAH (Asma ul Husna)
+    </button>
+
+    <!-- Timer Card -->
+    <div class="card">
 
         <!-- Age Selector -->
-        <div class="age-selector">
-            <label for="babyAge">👶 Baby's Age (Months)</label>
-            <select id="babyAge" onchange="updateDefaultTime()">
-                <option value="0">Select Age (Default: 20 min)</option>
-                <option value="1">1 Month (10 min)</option>
-                <option value="2">2 Months (14 min)</option>
-                <option value="3">3 Months (18 min)</option>
-                <option value="4">4 Months (20 min)</option>
-                <option value="5">5 Months (22 min)</option>
-                <option value="6">6 Months (24 min)</option>
-                <option value="7">7 Months (26 min)</option>
-                <option value="8">8 Months (28 min)</option>
-                <option value="9">9 Months (30 min)</option>
-                <option value="10">10 Months (32 min)</option>
-                <option value="11">11 Months (34 min)</option>
-                <option value="12">12+ Months (36 min)</option>
-            </select>
+        <p class="section-label">👶 Baby's Age</p>
+        <select id="babyAge" onchange="updateDefaultTime()" style="margin-bottom:16px;">
+            <option value="0">Select Age (Default: 20 min)</option>
+            <option value="1">1 Month — 10 min</option>
+            <option value="2">2 Months — 14 min</option>
+            <option value="3">3 Months — 18 min</option>
+            <option value="4">4 Months — 20 min</option>
+            <option value="5">5 Months — 22 min</option>
+            <option value="6">6 Months — 24 min</option>
+            <option value="7">7 Months — 26 min</option>
+            <option value="8">8 Months — 28 min</option>
+            <option value="9">9 Months — 30 min</option>
+            <option value="10">10 Months — 32 min</option>
+            <option value="11">11 Months — 34 min</option>
+            <option value="12">12+ Months — 36 min</option>
+        </select>
+
+        <div class="divider"></div>
+
+        <!-- Timer Ring -->
+        <div class="timer-core">
+            <p class="timer-status" id="timerStatus">Ready to Start</p>
+
+            <div class="timer-ring-wrap">
+                <svg viewBox="0 0 200 200">
+                    <circle class="ring-track" cx="100" cy="100" r="90"/>
+                    <circle class="ring-progress" id="ringProgress" cx="100" cy="100" r="90"/>
+                </svg>
+                <div class="timer-center">
+                    <span class="timer-display" id="displayText" style="display:none;">0:00</span>
+                    <input class="timer-input" id="minutesInput" type="number" value="20" min="1" max="120">
+                    <span class="timer-sub" id="timerSub">minutes</span>
+                </div>
+            </div>
+
+            <!-- Paused tag -->
+            <div class="paused-tag" id="pausedTag">⏸ Timer Paused</div>
+
+            <!-- Buttons -->
+            <div class="btn-row single" id="rowStart">
+                <button class="btn btn-primary" onclick="startTimer()">▶ Start Feeding Timer</button>
+            </div>
+            <div class="btn-row two" id="rowRunning" style="display:none;">
+                <button class="btn btn-pause" id="pauseBtn" onclick="pauseTimer()">⏸ Pause</button>
+                <button class="btn btn-stop" onclick="stopTimer()">⏹ Stop</button>
+            </div>
+            <div class="btn-row single" id="rowPaused" style="display:none;">
+                <button class="btn btn-resume" onclick="resumeTimer()">▶ Resume Timer</button>
+            </div>
         </div>
 
-        <div class="theme-selector">
-            <div class="color-dot" style="background: #121212;" onclick="setTheme('#121212', '#a29bfe')"></div> 
-            <div class="color-dot" style="background: #1e272e;" onclick="setTheme('#1e272e', '#00d2d3')"></div> 
-            <div class="color-dot" style="background: #2d3436;" onclick="setTheme('#2d3436', '#fab1a0')"></div> 
-            <div class="color-dot" style="background: #000000;" onclick="setTheme('#000000', '#55efc4')"></div> 
-            <div class="color-dot" style="background: #2c3e50;" onclick="setTheme('#2c3e50', '#74b9ff')"></div> 
-            <div class="color-dot" style="background: #222f3e;" onclick="setTheme('#222f3e', '#feca57')"></div> 
-            <div class="color-dot" style="background: #192a56;" onclick="setTheme('#192a56', '#ff9ff3')"></div> 
+        <!-- Last Feeding -->
+        <div class="last-feeding-bar" id="lastFeedingBar">
+            <div class="lf-dot"></div>
+            <span>Last feeding: <span class="lf-time" id="lastFeedingTime"></span></span>
         </div>
     </div>
 
-    <!-- History Section -->
-    <div class="history-container">
-        <div class="history-header">
-            <h2>Feeding History</h2>
+    <!-- Settings Row -->
+    <div class="toggle-row">
+        <span class="toggle-label">📳 Vibration Alert</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="vibrateToggle" checked>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="theme-row">
+        <span class="theme-label">Theme</span>
+        <div class="dot-wrap">
+            <div class="color-dot active" style="background:#0d0d14;" onclick="setTheme('#0d0d14','#c8a2c8','#f0c4d4',this)"></div>
+            <div class="color-dot" style="background:#0a1628;" onclick="setTheme('#0a1628','#74b9ff','#a0d4ff',this)"></div>
+            <div class="color-dot" style="background:#0f1f14;" onclick="setTheme('#0f1f14','#7de8b5','#b2f0d4',this)"></div>
+            <div class="color-dot" style="background:#1a0a0a;" onclick="setTheme('#1a0a0a','#ff9a9e','#fecfef',this)"></div>
+            <div class="color-dot" style="background:#0e0e0e;" onclick="setTheme('#0e0e0e','#e8c97a','#f5e4a8',this)"></div>
+            <div class="color-dot" style="background:#16101f;" onclick="setTheme('#16101f','#bd93f9','#f8b4f8',this)"></div>
+        </div>
+    </div>
+
+    <!-- History Card -->
+    <div class="card">
+        <div class="section-header">
+            <h2 class="section-title">Feeding History</h2>
+            <button class="btn-clear" onclick="clearHistory()">Clear All</button>
         </div>
         <div class="history-list" id="historyList">
-            <div class="no-history">No feeding records yet</div>
-        </div>
-        <button class="clear-history" onclick="clearHistory()" style="width: 100%; margin-top: 15px;">Clear All</button>
-    </div>
-
-    <!-- 99 Names of Allah Section -->
-    <div class="names-container" id="allahNames">
-        <div class="names-header">
-            <h2>🕌 99 Names of ALLAH</h2>
-        </div>
-        <div class="names-list" id="namesList">
-            <div class="name-item">
-                <div class="name-arabic">اللہ <span class="name-number">1</span></div>
-                <div class="name-transliteration">Allah</div>
-                <div class="name-urdu">اللہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الاحد <span class="name-number">2</span></div>
-                <div class="name-transliteration">Al-Ahad</div>
-                <div class="name-urdu">اکیلا، یکتا، تنہا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الاعلیٰ <span class="name-number">3</span></div>
-                <div class="name-transliteration">Al-A'lā</div>
-                <div class="name-urdu">بلندوبالا، اونچا، برتر</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الاکرم <span class="name-number">4</span></div>
-                <div class="name-transliteration">Al-Akram</div>
-                <div class="name-urdu">بہت زیادہ عزت والا، کرم والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الالٰہ <span class="name-number">5</span></div>
-                <div class="name-transliteration">Al-Ilāh</div>
-                <div class="name-urdu">عبادت اور محبت کے لائق</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الاول <span class="name-number">6</span></div>
-                <div class="name-transliteration">Al-Awwal</div>
-                <div class="name-urdu">سب سے پہلے وجود رکھنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الآخر <span class="name-number">7</span></div>
-                <div class="name-transliteration">Al-Ākhir</div>
-                <div class="name-urdu">سب کے بعد وجود رکھنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الظاہر <span class="name-number">8</span></div>
-                <div class="name-transliteration">Az-Zāhir</div>
-                <div class="name-urdu">سب سے ظاہر</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الباطن <span class="name-number">9</span></div>
-                <div class="name-transliteration">Al-Bātin</div>
-                <div class="name-urdu">سب سے پوشیدہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">البارئ <span class="name-number">10</span></div>
-                <div class="name-transliteration">Al-Bāri'</div>
-                <div class="name-urdu">جان ڈالنے والا، پیدا کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">البر <span class="name-number">11</span></div>
-                <div class="name-transliteration">Al-Barr</div>
-                <div class="name-urdu">بہت اچھا سلوک کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">البصیر <span class="name-number">12</span></div>
-                <div class="name-transliteration">Al-Basīr</div>
-                <div class="name-urdu">نہایت دیکھنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">التواب <span class="name-number">13</span></div>
-                <div class="name-transliteration">At-Tawwāb</div>
-                <div class="name-urdu">بہت زیادہ توبہ قبول کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الجبار <span class="name-number">14</span></div>
-                <div class="name-transliteration">Al-Jabbār</div>
-                <div class="name-urdu">اپنی مرضی چلانے والا، زبردست</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحافظ <span class="name-number">15</span></div>
-                <div class="name-transliteration">Al-Hāfiz</div>
-                <div class="name-urdu">حفاظت کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحسیب <span class="name-number">16</span></div>
-                <div class="name-transliteration">Al-Hasīb</div>
-                <div class="name-urdu">پورا حساب لینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحفیظ <span class="name-number">17</span></div>
-                <div class="name-transliteration">Al-Hafīz</div>
-                <div class="name-urdu">نہایت حفاظت کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحفی <span class="name-number">18</span></div>
-                <div class="name-transliteration">Al-Hafī</div>
-                <div class="name-urdu">بہت زیادہ مہربان</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحق <span class="name-number">19</span></div>
-                <div class="name-transliteration">Al-Haqq</div>
-                <div class="name-urdu">برحق، حق والا، سچا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المبین <span class="name-number">20</span></div>
-                <div class="name-transliteration">Al-Mubīn</div>
-                <div class="name-urdu">ظاہر کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحکیم <span class="name-number">21</span></div>
-                <div class="name-transliteration">Al-Hakīm</div>
-                <div class="name-urdu">نہایت حکمت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحلیم <span class="name-number">22</span></div>
-                <div class="name-transliteration">Al-Halīm</div>
-                <div class="name-urdu">نہایت برداشت کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحمید <span class="name-number">23</span></div>
-                <div class="name-transliteration">Al-Hamīd</div>
-                <div class="name-urdu">بے حد تعریف والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحی <span class="name-number">24</span></div>
-                <div class="name-transliteration">Al-Hayy</div>
-                <div class="name-urdu">خود زندہ، زندگی دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القیوم <span class="name-number">25</span></div>
-                <div class="name-transliteration">Al-Qayyūm</div>
-                <div class="name-urdu">خود قائم، قائم رکھنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الخبیر <span class="name-number">26</span></div>
-                <div class="name-transliteration">Al-Khabīr</div>
-                <div class="name-urdu">بہت زیادہ باخبر</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الخالق <span class="name-number">27</span></div>
-                <div class="name-transliteration">Al-Khāliq</div>
-                <div class="name-urdu">پیدا کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الخلاق <span class="name-number">28</span></div>
-                <div class="name-transliteration">Al-Khallāq</div>
-                <div class="name-urdu">بہت پیدا کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرؤوف <span class="name-number">29</span></div>
-                <div class="name-transliteration">Ar-Ra'ūf</div>
-                <div class="name-urdu">بہت زیادہ شفقت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرحمن <span class="name-number">30</span></div>
-                <div class="name-transliteration">Ar-Rahmān</div>
-                <div class="name-urdu">بہت رحم کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرحیم <span class="name-number">31</span></div>
-                <div class="name-transliteration">Ar-Rahīm</div>
-                <div class="name-urdu">ہمیشہ رحم کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرزاق <span class="name-number">32</span></div>
-                <div class="name-transliteration">Ar-Razzāq</div>
-                <div class="name-urdu">بہت رزق دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرقیب <span class="name-number">33</span></div>
-                <div class="name-transliteration">Ar-Raqīb</div>
-                <div class="name-urdu">پورا نگہبان، نگران</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">السلام <span class="name-number">34</span></div>
-                <div class="name-transliteration">As-Salām</div>
-                <div class="name-urdu">سراسر سلامتی</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">السمیع <span class="name-number">35</span></div>
-                <div class="name-transliteration">As-Samī'</div>
-                <div class="name-urdu">بہت زیادہ سننے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الشاکر <span class="name-number">36</span></div>
-                <div class="name-transliteration">Ash-Shākir</div>
-                <div class="name-urdu">قدردان</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الشکور <span class="name-number">37</span></div>
-                <div class="name-transliteration">Ash-Shakūr</div>
-                <div class="name-urdu">بہت زیادہ قدردان</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الشہید <span class="name-number">38</span></div>
-                <div class="name-transliteration">Ash-Shaheed</div>
-                <div class="name-urdu">گواہ، اطلاع رکھنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الصمد <span class="name-number">39</span></div>
-                <div class="name-transliteration">As-Samad</div>
-                <div class="name-urdu">بے عیب، بے نیاز، داتا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العالم <span class="name-number">40</span></div>
-                <div class="name-transliteration">Al-'Ālim</div>
-                <div class="name-urdu">ہر چیز کو جاننے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العزیز <span class="name-number">41</span></div>
-                <div class="name-transliteration">Al-'Azīz</div>
-                <div class="name-urdu">نہایت غلبے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العظیم <span class="name-number">42</span></div>
-                <div class="name-transliteration">Al-'Azīm</div>
-                <div class="name-urdu">نہایت عظمت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العفو <span class="name-number">43</span></div>
-                <div class="name-transliteration">Al-'Afūw</div>
-                <div class="name-urdu">نہایت درگزر کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العلیم <span class="name-number">44</span></div>
-                <div class="name-transliteration">Al-'Alīm</div>
-                <div class="name-urdu">بہت زیادہ علم والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">العلی <span class="name-number">45</span></div>
-                <div class="name-transliteration">Al-'Aliyy</div>
-                <div class="name-urdu">نہایت بلندی والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الغفار <span class="name-number">46</span></div>
-                <div class="name-transliteration">Al-Ghaffār</div>
-                <div class="name-urdu">بہت معاف کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الغفور <span class="name-number">47</span></div>
-                <div class="name-transliteration">Al-Ghafūr</div>
-                <div class="name-urdu">ہمیشہ معاف کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الغنی <span class="name-number">48</span></div>
-                <div class="name-transliteration">Al-Ghaniyy</div>
-                <div class="name-urdu">بڑا بے پروا، بے نیاز</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الفتاح <span class="name-number">49</span></div>
-                <div class="name-transliteration">Al-Fattāh</div>
-                <div class="name-urdu">بہت زیادہ کھولنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القادر <span class="name-number">50</span></div>
-                <div class="name-transliteration">Al-Qādir</div>
-                <div class="name-urdu">قدرت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القاہر <span class="name-number">51</span></div>
-                <div class="name-transliteration">Al-Qāhir</div>
-                <div class="name-urdu">غلبے والا، طاقتور</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القدوس <span class="name-number">52</span></div>
-                <div class="name-transliteration">Al-Quddūs</div>
-                <div class="name-urdu">نہایت پاک</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القریب <span class="name-number">53</span></div>
-                <div class="name-transliteration">Al-Qarīb</div>
-                <div class="name-urdu">حد درجہ قریب، نزدیک</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القوی <span class="name-number">54</span></div>
-                <div class="name-transliteration">Al-Qawiyy</div>
-                <div class="name-urdu">نہایت قوت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القدیر <span class="name-number">55</span></div>
-                <div class="name-transliteration">Al-Qadīr</div>
-                <div class="name-urdu">نہایت قدرت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القہار <span class="name-number">56</span></div>
-                <div class="name-transliteration">Al-Qahhār</div>
-                <div class="name-urdu">بڑا زبردست طاقتور</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الکبیر <span class="name-number">57</span></div>
-                <div class="name-transliteration">Al-Kabīr</div>
-                <div class="name-urdu">نہایت بڑائی والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الکریم <span class="name-number">58</span></div>
-                <div class="name-transliteration">Al-Karīm</div>
-                <div class="name-urdu">بہت زیادہ کرم والا، سخنی</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">اللطیف <span class="name-number">59</span></div>
-                <div class="name-transliteration">Al-Latīf</div>
-                <div class="name-urdu">باریک بین، نرمی کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المؤمن <span class="name-number">60</span></div>
-                <div class="name-transliteration">Al-Mu'min</div>
-                <div class="name-urdu">امن دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المتعالی <span class="name-number">61</span></div>
-                <div class="name-transliteration">Al-Muta'ālī</div>
-                <div class="name-urdu">نہایت بلند</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المتکبر <span class="name-number">62</span></div>
-                <div class="name-transliteration">Al-Mutakabbir</div>
-                <div class="name-urdu">بڑائی والا، تکبر والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المتین <span class="name-number">63</span></div>
-                <div class="name-transliteration">Al-Matīn</div>
-                <div class="name-urdu">نہایت مضبوط قوت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المجیب <span class="name-number">64</span></div>
-                <div class="name-transliteration">Al-Mujīb</div>
-                <div class="name-urdu">قبول کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المجید <span class="name-number">65</span></div>
-                <div class="name-transliteration">Al-Majīd</div>
-                <div class="name-urdu">نہایت بزرگی، شان والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المحیط <span class="name-number">66</span></div>
-                <div class="name-transliteration">Al-Muhīt</div>
-                <div class="name-urdu">احاطہ کرنے والا، گھیرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المصور <span class="name-number">67</span></div>
-                <div class="name-transliteration">Al-Musawwir</div>
-                <div class="name-urdu">شکل بنانے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المقتدر <span class="name-number">68</span></div>
-                <div class="name-transliteration">Al-Muqtadir</div>
-                <div class="name-urdu">نہایت قدرت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المقیت <span class="name-number">69</span></div>
-                <div class="name-transliteration">Al-Muqīt</div>
-                <div class="name-urdu">نگرانی کرنے والا، روزی دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الملک <span class="name-number">70</span></div>
-                <div class="name-transliteration">Al-Malik</div>
-                <div class="name-urdu">بادشاہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المالک <span class="name-number">71</span></div>
-                <div class="name-transliteration">Al-Malīk</div>
-                <div class="name-urdu">عظیم بادشاہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المولیٰ <span class="name-number">72</span></div>
-                <div class="name-transliteration">Al-Mawlā</div>
-                <div class="name-urdu">مالک، آقا، مددگار</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المہیمن <span class="name-number">73</span></div>
-                <div class="name-transliteration">Al-Muhaymin</div>
-                <div class="name-urdu">پورا نگران</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">النصیر <span class="name-number">74</span></div>
-                <div class="name-transliteration">An-Nasīr</div>
-                <div class="name-urdu">نہایت مددگار</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الواحد <span class="name-number">75</span></div>
-                <div class="name-transliteration">Al-Wāhid</div>
-                <div class="name-urdu">ایک، اکیلا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الوارث <span class="name-number">76</span></div>
-                <div class="name-transliteration">Al-Wārith</div>
-                <div class="name-urdu">وارث، اصلی مالک</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الواسع <span class="name-number">77</span></div>
-                <div class="name-transliteration">Al-Wāsi'</div>
-                <div class="name-urdu">وسعت والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الودود <span class="name-number">78</span></div>
-                <div class="name-transliteration">Al-Wadūd</div>
-                <div class="name-urdu">نہایت پیار کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الوکیل <span class="name-number">79</span></div>
-                <div class="name-transliteration">Al-Wakīl</div>
-                <div class="name-urdu">اچھا کارساز</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الولی <span class="name-number">80</span></div>
-                <div class="name-transliteration">Al-Waliyy</div>
-                <div class="name-urdu">دوست، مددگار</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الوہاب <span class="name-number">81</span></div>
-                <div class="name-transliteration">Al-Wahhāb</div>
-                <div class="name-urdu">بہت زیادہ دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الجمیل <span class="name-number">82</span></div>
-                <div class="name-transliteration">Al-Jamīl</div>
-                <div class="name-urdu">نہایت خوبصورت</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الجواد <span class="name-number">83</span></div>
-                <div class="name-transliteration">Al-Jawād</div>
-                <div class="name-urdu">نہایت سخی، فیاض</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحکم <span class="name-number">84</span></div>
-                <div class="name-transliteration">Al-Hakam</div>
-                <div class="name-urdu">فیصلہ کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الحیی <span class="name-number">85</span></div>
-                <div class="name-transliteration">Al-Hammī</div>
-                <div class="name-urdu">نہایت حیاء والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرب <span class="name-number">86</span></div>
-                <div class="name-transliteration">Ar-Rabb</div>
-                <div class="name-urdu">پرورش کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الرفیق <span class="name-number">87</span></div>
-                <div class="name-transliteration">Ar-Rafīq</div>
-                <div class="name-urdu">نہایت نرمی والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">السبوح <span class="name-number">88</span></div>
-                <div class="name-transliteration">As-Subūh</div>
-                <div class="name-urdu">نہایت پاکیزہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">السید <span class="name-number">89</span></div>
-                <div class="name-transliteration">As-Sayyid</div>
-                <div class="name-urdu">سردار، بادشاہ، آقا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الشافی <span class="name-number">90</span></div>
-                <div class="name-transliteration">Ash-Shānī</div>
-                <div class="name-urdu">شفا دینے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الطیب <span class="name-number">91</span></div>
-                <div class="name-transliteration">At-Tayyib</div>
-                <div class="name-urdu">پاک، پاکیزہ</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">القابض <span class="name-number">92</span></div>
-                <div class="name-transliteration">Al-Qābid</div>
-                <div class="name-urdu">قبضے والا، کنٹرول کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الباسط <span class="name-number">93</span></div>
-                <div class="name-transliteration">Al-Bāsit</div>
-                <div class="name-urdu">کھولنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المقدم <span class="name-number">94</span></div>
-                <div class="name-transliteration">Al-Muqaddim</div>
-                <div class="name-urdu">آگے کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المؤخر <span class="name-number">95</span></div>
-                <div class="name-transliteration">Al-Mu'akhkhir</div>
-                <div class="name-urdu">پیچھے کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المحسن <span class="name-number">96</span></div>
-                <div class="name-transliteration">Al-Muhsin</div>
-                <div class="name-urdu">احسان کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المعطی <span class="name-number">97</span></div>
-                <div class="name-transliteration">Al-Mu'tī</div>
-                <div class="name-urdu">عطا کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">المنان <span class="name-number">98</span></div>
-                <div class="name-transliteration">Al-Mannān</div>
-                <div class="name-urdu">بہت زیادہ احسان کرنے والا</div>
-            </div>
-            <div class="name-item">
-                <div class="name-arabic">الوتر <span class="name-number">99</span></div>
-                <div class="name-transliteration">Al-Witr</div>
-                <div class="name-urdu">وتر، یکتا، اکیلا</div>
+            <div class="no-history">
+                <span class="no-history-icon">🍼</span>
+                No feeding records yet
             </div>
         </div>
     </div>
 
-    <div class="credits"><a href="https://www.facebook.com/samibajwaisking" target="_blank" style="color: inherit; text-decoration: none;">By: SamiBajwa</a></div>
+    <!-- 99 Names of Allah -->
+    <div class="card names-card" id="allahNames">
+        <div class="section-header">
+            <h2 class="section-title">🕌 99 Names of ALLAH</h2>
+        </div>
+        <input class="names-search" id="namesSearch" type="text" placeholder="Search by name or meaning…" oninput="filterNames()">
+        <div class="names-list" id="namesList"></div>
+    </div>
 
-    <script>
-        let countdown;
-        let wakeLock = null;
-        let isPaused = false;
-        let remainingSeconds = 0;
-        let startTime = null;
-        let totalDuration = 0;
-        let pausedTime = 0;
-        let twoHourTimer = null; // Timer for 2-hour notification
+    <div class="footer">
+        <a href="https://www.facebook.com/samibajwaisking" target="_blank">By: Sami Bajwa</a>
+    </div>
 
-        // Age-based default feeding times (in minutes)
-        const ageBasedTimes = {
-            0: 20,  // Default (no age selected)
-            1: 10,  // 1 month
-            2: 14,  // 2 months
-            3: 18,  // 3 months
-            4: 20,  // 4 months
-            5: 22,  // 5 months
-            6: 24,  // 6 months
-            7: 26,  // 7 months
-            8: 28,  // 8 months
-            9: 30,  // 9 months
-            10: 32, // 10 months
-            11: 34, // 11 months
-            12: 36  // 12+ months
-        };
+</div>
 
-        // Update default time based on selected age
-        function updateDefaultTime() {
-            const ageSelect = document.getElementById('babyAge');
-            const minutesInput = document.getElementById('minutes');
-            const selectedAge = parseInt(ageSelect.value);
-            
-            // Only update if timer is not running
-            if (document.getElementById('startBtn').style.display !== 'none') {
-                minutesInput.value = ageBasedTimes[selectedAge];
-            }
-        }
+<script>
+// ── Data ──────────────────────────────────────────────────────
+const AGE_TIMES = {0:20,1:10,2:14,3:18,4:20,5:22,6:24,7:26,8:28,9:30,10:32,11:34,12:36};
 
-        // Mother Love Quotes Collection (365+ quotes for no repeats in 30 days)
-        const motherQuotes = [
-            "A mother's love is the fuel that enables a normal human being to do the impossible.",
-            "There is no way to be a perfect mother, but a million ways to be a good one.",
-            "A mother's arms are more comforting than anyone else's.",
-            "Mother's love is peace. It need not be acquired, it need not be deserved.",
-            "Life doesn't come with a manual, it comes with a mother.",
-            "The influence of a mother in the lives of her children is beyond calculation.",
-            "A mother's love for her child is like nothing else in the world.",
-            "Motherhood: All love begins and ends there.",
-            "A mother is she who can take the place of all others but whose place no one else can take.",
-            "Behind every young child who believes in himself is a mother who believed first.",
-            "To the world you are a mother, but to your family you are the world.",
-            "A mother's hug lasts long after she lets go.",
-            "Mothers hold their children's hands for a short while, but their hearts forever.",
-            "The heart of a mother is a deep abyss at the bottom of which you will always find forgiveness.",
-            "A mother's love is the strongest energy known to mankind.",
-            "Being a mother is learning about strengths you didn't know you had.",
-            "Motherhood is the biggest gamble in the world. It is the glorious life force.",
-            "A mother's love doesn't make her son more dependent, it makes him stronger.",
-            "There is nothing as sincere as a mother's kiss.",
-            "The days are long but the years are short.",
-            "A mother understands what a child does not say.",
-            "Mothers are like glue. Even when you can't see them, they're still holding the family together.",
-            "A mother's love is patient and forgiving when all others are forsaking.",
-            "No language can express the power and beauty of a mother's love.",
-            "A mother is your first friend, your best friend, your forever friend.",
-            "The most precious jewels you'll ever have around your neck are the arms of your children.",
-            "A baby fills a place in your heart you never knew was empty.",
-            "Making the decision to have a child is momentous. It is to decide forever to have your heart go walking around outside your body.",
-            "A mother's joy begins when new life is stirring inside, when a tiny heartbeat is heard for the very first time.",
-            "There is no school for mothers. You learn on the job.",
-            "Motherhood is a choice you make every day, to put someone else's happiness before your own.",
-            "A mother's love is whole no matter how many times divided.",
-            "The loveliest masterpiece of the heart of God is the heart of a mother.",
-            "A mother's treasure is her daughter.",
-            "A son is a son till he takes him a wife, a daughter is a daughter all of her life.",
-            "Biology is the least of what makes someone a mother.",
-            "Every beetle is a gazelle in the eyes of its mother.",
-            "No one in your life will ever love you as your mother does.",
-            "Mothers and their children are in a category all their own.",
-            "A mother is the one who fills your heart in the first place.",
-            "All that I am or hope to be, I owe to my mother.",
-            "A mother's love liberates.",
-            "Mother love is the most powerful force on earth.",
-            "When you are a mother, you are never really alone in your thoughts.",
-            "A mother's love endures through all.",
-            "The only love that I really believe in is a mother's love for her children.",
-            "If love is sweet as a flower, then my mother is that sweet flower of love.",
-            "A mother's love is like an everlasting bed of roses, that continues to blossom.",
-            "A mother's happiness is like a beacon, lighting up the future.",
-            "Acceptance, tolerance, bravery, compassion. These are the things my mom taught me."
-        ];
+const NAMES = [
+  ["الله","Allah","الله"],
+  ["الرحمن","Ar-Rahmān","بہت رحم کرنے والا"],
+  ["الرحیم","Ar-Rahīm","ہمیشہ رحم کرنے والا"],
+  ["الملک","Al-Malik","بادشاہ"],
+  ["القدوس","Al-Quddūs","نہایت پاک"],
+  ["السلام","As-Salām","سراسر سلامتی"],
+  ["المؤمن","Al-Mu'min","امن دینے والا"],
+  ["المہیمن","Al-Muhaymin","پورا نگران"],
+  ["العزیز","Al-'Azīz","نہایت غلبے والا"],
+  ["الجبار","Al-Jabbār","اپنی مرضی چلانے والا"],
+  ["المتکبر","Al-Mutakabbir","بڑائی والا"],
+  ["الخالق","Al-Khāliq","پیدا کرنے والا"],
+  ["البارئ","Al-Bāri'","جان ڈالنے والا"],
+  ["المصور","Al-Musawwir","شکل بنانے والا"],
+  ["الغفار","Al-Ghaffār","بہت معاف کرنے والا"],
+  ["القہار","Al-Qahhār","بڑا زبردست طاقتور"],
+  ["الوہاب","Al-Wahhāb","بہت زیادہ دینے والا"],
+  ["الرزاق","Ar-Razzāq","بہت رزق دینے والا"],
+  ["الفتاح","Al-Fattāh","بہت زیادہ کھولنے والا"],
+  ["العلیم","Al-'Alīm","بہت زیادہ علم والا"],
+  ["القابض","Al-Qābid","قبضے والا"],
+  ["الباسط","Al-Bāsit","کھولنے والا"],
+  ["الخافض","Al-Khāfid","نیچے کرنے والا"],
+  ["الرافع","Ar-Rāfi'","اوپر اٹھانے والا"],
+  ["المعز","Al-Mu'izz","عزت دینے والا"],
+  ["المذل","Al-Mudhill","ذلیل کرنے والا"],
+  ["السمیع","As-Samī'","بہت زیادہ سننے والا"],
+  ["البصیر","Al-Basīr","نہایت دیکھنے والا"],
+  ["الحکم","Al-Hakam","فیصلہ کرنے والا"],
+  ["العدل","Al-'Adl","انصاف کرنے والا"],
+  ["اللطیف","Al-Latīf","باریک بین، نرمی کرنے والا"],
+  ["الخبیر","Al-Khabīr","بہت زیادہ باخبر"],
+  ["الحلیم","Al-Halīm","نہایت برداشت کرنے والا"],
+  ["العظیم","Al-'Azīm","نہایت عظمت والا"],
+  ["الغفور","Al-Ghafūr","ہمیشہ معاف کرنے والا"],
+  ["الشکور","Ash-Shakūr","بہت زیادہ قدردان"],
+  ["العلی","Al-'Aliyy","نہایت بلندی والا"],
+  ["الکبیر","Al-Kabīr","نہایت بڑائی والا"],
+  ["الحفیظ","Al-Hafīz","نہایت حفاظت کرنے والا"],
+  ["المقیت","Al-Muqīt","نگرانی کرنے والا"],
+  ["الحسیب","Al-Hasīb","پورا حساب لینے والا"],
+  ["الجلیل","Al-Jalīl","نہایت جلال والا"],
+  ["الکریم","Al-Karīm","بہت زیادہ کرم والا"],
+  ["الرقیب","Ar-Raqīb","پورا نگہبان"],
+  ["المجیب","Al-Mujīb","قبول کرنے والا"],
+  ["الواسع","Al-Wāsi'","وسعت والا"],
+  ["الحکیم","Al-Hakīm","نہایت حکمت والا"],
+  ["الودود","Al-Wadūd","نہایت پیار کرنے والا"],
+  ["المجید","Al-Majīd","نہایت بزرگی والا"],
+  ["الباعث","Al-Bā'ith","اٹھانے والا"],
+  ["الشہید","Ash-Shaheed","گواہ"],
+  ["الحق","Al-Haqq","برحق، سچا"],
+  ["الوکیل","Al-Wakīl","اچھا کارساز"],
+  ["القوی","Al-Qawiyy","نہایت قوت والا"],
+  ["المتین","Al-Matīn","نہایت مضبوط"],
+  ["الولی","Al-Waliyy","دوست، مددگار"],
+  ["الحمید","Al-Hamīd","بے حد تعریف والا"],
+  ["المحصی","Al-Muhsī","گنتی کرنے والا"],
+  ["المبدئ","Al-Mubdi'","شروع کرنے والا"],
+  ["المعید","Al-Mu'īd","دوبارہ پیدا کرنے والا"],
+  ["المحیی","Al-Muhyī","زندگی دینے والا"],
+  ["الممیت","Al-Mumīt","موت دینے والا"],
+  ["الحی","Al-Hayy","خود زندہ"],
+  ["القیوم","Al-Qayyūm","خود قائم رکھنے والا"],
+  ["الواجد","Al-Wājid","سب کچھ پانے والا"],
+  ["الماجد","Al-Mājid","بزرگ و برتر"],
+  ["الواحد","Al-Wāhid","ایک، اکیلا"],
+  ["الاحد","Al-Ahad","یکتا، تنہا"],
+  ["الصمد","As-Samad","بے عیب، بے نیاز"],
+  ["القادر","Al-Qādir","قدرت والا"],
+  ["المقتدر","Al-Muqtadir","نہایت قدرت والا"],
+  ["المقدم","Al-Muqaddim","آگے کرنے والا"],
+  ["المؤخر","Al-Mu'akhkhir","پیچھے کرنے والا"],
+  ["الاول","Al-Awwal","سب سے پہلے"],
+  ["الآخر","Al-Ākhir","سب کے بعد"],
+  ["الظاہر","Az-Zāhir","سب سے ظاہر"],
+  ["الباطن","Al-Bātin","سب سے پوشیدہ"],
+  ["الوالی","Al-Wālī","مالک و حاکم"],
+  ["المتعالی","Al-Muta'ālī","نہایت بلند"],
+  ["البر","Al-Barr","بہت اچھا سلوک کرنے والا"],
+  ["التواب","At-Tawwāb","بہت زیادہ توبہ قبول کرنے والا"],
+  ["المنتقم","Al-Muntaqim","بدلہ لینے والا"],
+  ["العفو","Al-'Afūw","نہایت درگزر کرنے والا"],
+  ["الرؤوف","Ar-Ra'ūf","بہت زیادہ شفقت والا"],
+  ["مالک الملک","Mālik-ul-Mulk","ساری بادشاہی کا مالک"],
+  ["ذوالجلال","Dhul-Jalāl","جلال و اکرام والا"],
+  ["المقسط","Al-Muqsit","انصاف کرنے والا"],
+  ["الجامع","Al-Jāmi'","اکٹھا کرنے والا"],
+  ["الغنی","Al-Ghaniyy","بڑا بے نیاز"],
+  ["المغنی","Al-Mughnī","غنی کرنے والا"],
+  ["المانع","Al-Māni'","روکنے والا"],
+  ["الضار","Ad-Dārr","نقصان پہنچانے والا"],
+  ["النافع","An-Nāfi'","فائدہ دینے والا"],
+  ["النور","An-Nūr","نور، روشنی"],
+  ["الہادی","Al-Hādī","ہدایت دینے والا"],
+  ["البدیع","Al-Badī'","بے مثال پیدا کرنے والا"],
+  ["الباقی","Al-Bāqī","ہمیشہ رہنے والا"],
+  ["الوارث","Al-Wārith","وارث، اصلی مالک"],
+  ["الرشید","Ar-Rashīd","سیدھی راہ دکھانے والا"],
+  ["الصبور","As-Sabūr","بہت زیادہ صبر کرنے والا"]
+];
 
-        // Quote rotation system
-        let currentQuoteIndex = 0;
-        let usedQuotes = [];
+const QUOTES = [
+    "A mother's love is the fuel that enables a normal human being to do the impossible.",
+    "There is no way to be a perfect mother, but a million ways to be a good one.",
+    "A mother's arms are more comforting than anyone else's.",
+    "Mother's love is peace. It need not be acquired, it need not be deserved.",
+    "Life doesn't come with a manual, it comes with a mother.",
+    "The influence of a mother in the lives of her children is beyond calculation.",
+    "A mother's love for her child is like nothing else in the world.",
+    "Motherhood: All love begins and ends there.",
+    "A mother is she who can take the place of all others but whose place no one else can take.",
+    "Behind every young child who believes in himself is a mother who believed first.",
+    "To the world you are a mother, but to your family you are the world.",
+    "A mother's hug lasts long after she lets go.",
+    "Mothers hold their children's hands for a short while, but their hearts forever.",
+    "The heart of a mother is a deep abyss at the bottom of which you will always find forgiveness.",
+    "A mother's love is the strongest energy known to mankind.",
+    "Being a mother is learning about strengths you didn't know you had.",
+    "Motherhood is the biggest gamble in the world. It is the glorious life force.",
+    "A mother understands what a child does not say.",
+    "The days are long but the years are short.",
+    "Mothers are like glue — even when you can't see them, they're still holding the family together.",
+    "A baby fills a place in your heart you never knew was empty.",
+    "Making the decision to have a child is to decide forever to have your heart walking outside your body.",
+    "A mother's joy begins when new life is stirring inside.",
+    "Motherhood is a choice you make every day, to put someone else's happiness before your own.",
+    "A mother's love is whole no matter how many times divided.",
+    "The loveliest masterpiece of God's heart is the heart of a mother.",
+    "Biology is the least of what makes someone a mother.",
+    "No one in your life will ever love you as your mother does.",
+    "All that I am or hope to be, I owe to my mother.",
+    "A mother's happiness is like a beacon, lighting up the future."
+];
 
-        // Load used quotes from localStorage
-        function loadUsedQuotes() {
-            const stored = localStorage.getItem('usedMotherQuotes');
-            if (stored) {
-                const data = JSON.parse(stored);
-                // Check if data is older than 30 days
-                const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-                if (data.timestamp > thirtyDaysAgo) {
-                    usedQuotes = data.quotes || [];
-                } else {
-                    // Reset if older than 30 days
-                    usedQuotes = [];
-                    localStorage.removeItem('usedMotherQuotes');
-                }
-            }
-        }
+// ── Timer State ─────────────────────────────────────────────
+let interval = null;
+let wakeLock = null;
+let isPaused = false;
+let remainSec = 0;
+let totalSec = 0;
+let twoHourTimer = null;
 
-        // Save used quotes to localStorage
-        function saveUsedQuotes() {
-            const data = {
-                quotes: usedQuotes,
-                timestamp: Date.now()
-            };
-            localStorage.setItem('usedMotherQuotes', JSON.stringify(data));
-        }
+const RING_CIRC = 2 * Math.PI * 90; // 565.5
 
-        // Get next quote (no repeats for 30 days)
-        function getNextQuote() {
-            loadUsedQuotes();
-            
-            // If all quotes have been used, reset
-            if (usedQuotes.length >= motherQuotes.length) {
-                usedQuotes = [];
-            }
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    renderNames();
+    displayHistory();
+    updateLastFeeding();
+    setQuote();
+    setInterval(rotateQuote, 60000);
+    setInterval(() => { displayHistory(); updateLastFeeding(); }, 60000);
+    checkPendingReminder();
+    requestNotifPerm();
+});
 
-            // Find unused quotes
-            const unusedQuotes = motherQuotes.filter((quote, index) => !usedQuotes.includes(index));
-            
-            // Pick a random unused quote
-            const randomIndex = Math.floor(Math.random() * unusedQuotes.length);
-            const selectedQuote = unusedQuotes[randomIndex];
-            const originalIndex = motherQuotes.indexOf(selectedQuote);
-            
-            // Mark as used
-            usedQuotes.push(originalIndex);
-            saveUsedQuotes();
-            
-            return selectedQuote;
-        }
+// ── Quote ────────────────────────────────────────────────────
+let usedIdx = [];
 
-        // Update quote display with fade effect
-        function updateQuote() {
-            const quoteElement = document.getElementById('quoteText');
-            
-            // Fade out
-            quoteElement.classList.add('quote-fade');
-            
-            setTimeout(() => {
-                // Change quote
-                quoteElement.textContent = `"${getNextQuote()}"`;
-                
-                // Fade in
-                quoteElement.classList.remove('quote-fade');
-            }, 500);
-        }
+function getQuote() {
+    try {
+        const d = JSON.parse(localStorage.getItem('mqUsed') || '{}');
+        if (Date.now() - (d.ts||0) < 30*86400000) usedIdx = d.q || [];
+        else usedIdx = [];
+    } catch { usedIdx = []; }
+    if (usedIdx.length >= QUOTES.length) usedIdx = [];
+    const avail = QUOTES.map((_,i)=>i).filter(i=>!usedIdx.includes(i));
+    const pick = avail[Math.floor(Math.random()*avail.length)];
+    usedIdx.push(pick);
+    try { localStorage.setItem('mqUsed', JSON.stringify({q:usedIdx,ts:Date.now()})); } catch{}
+    return QUOTES[pick];
+}
 
-        // Prevent page refresh when timer is running
-        window.addEventListener('beforeunload', function (e) {
-            // Check if timer is running (startBtn is hidden means timer is active)
-            if (document.getElementById('startBtn').style.display === 'none') {
-                e.preventDefault();
-                e.returnValue = ''; // Chrome requires returnValue to be set
-                return ''; // For older browsers
-            }
+function setQuote() {
+    document.getElementById('quoteText').textContent = getQuote();
+}
+
+function rotateQuote() {
+    const el = document.getElementById('quoteText');
+    el.classList.add('fade');
+    setTimeout(() => { el.textContent = getQuote(); el.classList.remove('fade'); }, 500);
+}
+
+// ── Age ───────────────────────────────────────────────────────
+function updateDefaultTime() {
+    if (!interval) {
+        const age = +document.getElementById('babyAge').value;
+        document.getElementById('minutesInput').value = AGE_TIMES[age] || 20;
+    }
+}
+
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer() {
+    const mins = parseFloat(document.getElementById('minutesInput').value) || 20;
+    totalSec = Math.round(mins * 60);
+    remainSec = totalSec;
+    if (remainSec <= 0) return;
+
+    isPaused = false;
+
+    document.getElementById('rowStart').style.display = 'none';
+    document.getElementById('rowRunning').style.display = 'grid';
+    document.getElementById('rowPaused').style.display = 'none';
+    document.getElementById('minutesInput').style.display = 'none';
+    document.getElementById('displayText').style.display = 'inline';
+    document.getElementById('timerSub').textContent = 'remaining';
+    setStatus('running', 'Timer Running');
+
+    updateRing(remainSec);
+    tick();
+    interval = setInterval(tick, 1000);
+    reqWakeLock();
+}
+
+function tick() {
+    if (isPaused) return;
+    remainSec--;
+    updateDisplay(remainSec);
+    updateRing(remainSec);
+    if (remainSec <= 0) {
+        clearInterval(interval); interval = null;
+        triggerAlarm(true);
+    }
+}
+
+function updateDisplay(s) {
+    const m = Math.floor(Math.max(s,0)/60);
+    const sec = Math.max(s,0)%60;
+    document.getElementById('displayText').textContent = `${m}:${sec<10?'0':''}${sec}`;
+}
+
+function updateRing(s) {
+    const pct = totalSec > 0 ? Math.max(s,0)/totalSec : 0;
+    const offset = RING_CIRC * (1 - pct);
+    const ring = document.getElementById('ringProgress');
+    ring.style.strokeDashoffset = offset;
+    ring.style.strokeDasharray = RING_CIRC;
+}
+
+function pauseTimer() {
+    isPaused = true;
+    document.getElementById('rowRunning').style.display = 'none';
+    document.getElementById('rowPaused').style.display = 'grid';
+    document.getElementById('pausedTag').classList.add('visible');
+    document.getElementById('ringProgress').classList.add('paused');
+    setStatus('paused', 'Paused');
+}
+
+function resumeTimer() {
+    isPaused = false;
+    document.getElementById('rowRunning').style.display = 'grid';
+    document.getElementById('rowPaused').style.display = 'none';
+    document.getElementById('pausedTag').classList.remove('visible');
+    document.getElementById('ringProgress').classList.remove('paused');
+    setStatus('running', 'Timer Running');
+}
+
+function stopTimer() {
+    if (!confirm('Stop the feeding timer?\n\nOK = Stop  |  Cancel = Continue')) return;
+    clearInterval(interval); interval = null;
+    saveSession(false);
+    resetUI();
+}
+
+function triggerAlarm(completed) {
+    setStatus('complete', 'Feeding Complete! 🎉');
+    document.getElementById('ringProgress').classList.add('complete');
+    // 5-second one-time color flash
+    document.body.classList.remove('alarm-active');
+    void document.body.offsetWidth;
+    document.body.classList.add('alarm-active');
+    setTimeout(() => document.body.classList.remove('alarm-active'), 5000);
+    if (document.getElementById('vibrateToggle').checked && navigator.vibrate)
+        navigator.vibrate([500,300,500,300,500]);
+    saveSession(completed);
+    setTimeout(resetUI, 5000);
+}
+
+function resetUI() {
+    clearInterval(interval); interval = null;
+    isPaused = false;
+    remainSec = 0;
+    document.body.classList.remove('alarm-active');
+    document.getElementById('rowStart').style.display = 'grid';
+    document.getElementById('rowRunning').style.display = 'none';
+    document.getElementById('rowPaused').style.display = 'none';
+    document.getElementById('pausedTag').classList.remove('visible');
+    document.getElementById('minutesInput').style.display = 'inline';
+    document.getElementById('displayText').style.display = 'none';
+    document.getElementById('timerSub').textContent = 'minutes';
+    document.getElementById('ringProgress').classList.remove('paused','complete');
+    document.getElementById('ringProgress').style.strokeDashoffset = RING_CIRC;
+    setStatus('', 'Ready to Start');
+    if (wakeLock) { try { wakeLock.release(); } catch{} wakeLock = null; }
+}
+
+function setStatus(cls, txt) {
+    const el = document.getElementById('timerStatus');
+    el.className = 'timer-status';
+    if (cls) el.classList.add(cls);
+    el.textContent = txt;
+}
+
+// ── Session ───────────────────────────────────────────────────
+function saveSession(completed) {
+    const actual = totalSec - remainSec;
+    const m = Math.floor(actual/60), s = actual%60;
+    const record = {
+        timestamp: new Date().toISOString(),
+        duration: `${m}m ${s}s`,
+        completed,
+        target: `${Math.floor(totalSec/60)} min`
+    };
+    const hist = getHistory();
+    hist.unshift(record);
+    try { localStorage.setItem('feedingHistory', JSON.stringify(hist.slice(0,20))); } catch{}
+    displayHistory();
+    updateLastFeeding();
+    startTwoHourReminder();
+}
+
+// ── History ───────────────────────────────────────────────────
+function getHistory() {
+    try { return JSON.parse(localStorage.getItem('feedingHistory') || '[]'); } catch { return []; }
+}
+
+function displayHistory() {
+    const list = document.getElementById('historyList');
+    const hist = getHistory();
+    if (!hist.length) {
+        list.innerHTML = '<div class="no-history"><span class="no-history-icon">🍼</span>No feeding records yet</div>';
+        return;
+    }
+    const now = Date.now();
+    list.innerHTML = hist.map(r => {
+        const d = new Date(r.timestamp);
+        const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+        const timeStr = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        const diffMin = Math.floor((now - d)/60000);
+        let ago;
+        if (diffMin < 1) ago = 'Just now';
+        else if (diffMin < 60) ago = `${diffMin}m ago`;
+        else if (diffMin < 1440) {
+            const h = Math.floor(diffMin/60), m = diffMin%60;
+            ago = m ? `${h}h ${m}m ago` : `${h}h ago`;
+        } else ago = `${Math.floor(diffMin/1440)}d ago`;
+        return `<div class="h-item">
+            <div class="h-top"><span class="h-date">${dateStr}</span><span class="h-ago">${ago}</span></div>
+            <div class="h-duration">${r.duration}</div>
+            <div class="h-ended">Ended at ${timeStr}</div>
+        </div>`;
+    }).join('');
+}
+
+function clearHistory() {
+    if (!confirm('Clear all feeding history?')) return;
+    try { localStorage.removeItem('feedingHistory'); localStorage.removeItem('nextFeedingReminder'); } catch{}
+    if (twoHourTimer) { clearTimeout(twoHourTimer); twoHourTimer = null; }
+    displayHistory();
+    updateLastFeeding();
+}
+
+function updateLastFeeding() {
+    const hist = getHistory();
+    const bar = document.getElementById('lastFeedingBar');
+    if (!hist.length) { bar.classList.remove('visible'); return; }
+    const d = new Date(hist[0].timestamp);
+    const diffMin = Math.floor((Date.now()-d)/60000);
+    let txt;
+    if (diffMin < 1) txt = 'Just now';
+    else if (diffMin < 60) txt = `${diffMin} minute${diffMin>1?'s':''} ago`;
+    else if (diffMin < 1440) {
+        const h=Math.floor(diffMin/60),m=diffMin%60;
+        txt = m ? `${h}h ${m}m ago` : `${h} hour${h>1?'s':''} ago`;
+    } else { const days=Math.floor(diffMin/1440); txt=`${days} day${days>1?'s':''} ago`; }
+    document.getElementById('lastFeedingTime').textContent = txt;
+    bar.classList.add('visible');
+}
+
+// ── 2-Hour Reminder ──────────────────────────────────────────
+function startTwoHourReminder() {
+    if (twoHourTimer) clearTimeout(twoHourTimer);
+    const at = Date.now() + 2*3600000;
+    try { localStorage.setItem('nextFeedingReminder', at); } catch{}
+    twoHourTimer = setTimeout(show2HourAlert, 2*3600000);
+}
+
+function checkPendingReminder() {
+    try {
+        const at = parseInt(localStorage.getItem('nextFeedingReminder')||'0');
+        if (!at) return;
+        const left = at - Date.now();
+        if (left <= 0) show2HourAlert();
+        else twoHourTimer = setTimeout(show2HourAlert, left);
+    } catch{}
+}
+
+function show2HourAlert() {
+    // 5-second one-time color flash
+    document.body.classList.remove('alarm-active');
+    void document.body.offsetWidth; // force reflow to restart animation
+    document.body.classList.add('alarm-active');
+    setTimeout(() => document.body.classList.remove('alarm-active'), 5000);
+
+    // Vibration
+    if (navigator.vibrate) navigator.vibrate([1000,500,1000,500,1000]);
+
+    // Browser notification
+    if (window.Notification && Notification.permission==='granted') {
+        new Notification('Feeding Time 🍼', {
+            body: '2 ghantay ho gaye — Baby ko feed karne ka waqt aa gaya!',
+            requireInteraction: true
         });
+    }
 
-        // Load history from localStorage
-        function loadHistory() {
-            const history = localStorage.getItem('feedingHistory');
-            return history ? JSON.parse(history) : [];
-        }
+    // Custom modal
+    showFeedingModal();
 
-        // Save history to localStorage (keep only last 20)
-        function saveHistory(record) {
-            let history = loadHistory();
-            history.unshift(record); // Add to beginning
-            history = history.slice(0, 20); // Keep only last 20 records
-            localStorage.setItem('feedingHistory', JSON.stringify(history));
-            displayHistory();
-        }
+    try { localStorage.removeItem('nextFeedingReminder'); } catch{}
+}
 
-        // Display history
-        function displayHistory() {
-            const historyList = document.getElementById('historyList');
-            const history = loadHistory();
-            
-            if (history.length === 0) {
-                historyList.innerHTML = '<div class="no-history">No feeding records yet</div>';
-                return;
-            }
+function showFeedingModal() {
+    // Remove any existing modal
+    const old = document.getElementById('feedingModal');
+    if (old) old.remove();
 
-            const now = new Date();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'feedingModal';
+    overlay.innerHTML = `
+        <div class="modal-box">
+            <span class="modal-icon">🍼</span>
+            <div class="modal-title">Feeding Time!</div>
+            <p class="modal-msg">2 hours have passed since the last feeding session.</p>
+            <p class="modal-urdu">2 گھنٹے مکمل ہو گئے — بچے کو دودھ پلانے کا وقت آ گیا!</p>
+            <button class="modal-btn" onclick="closeFeedingModal()">✓ Okay, Got It!</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
 
-            historyList.innerHTML = history.map(record => {
-                const date = new Date(record.timestamp);
-                const dateStr = date.toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                const timeStr = date.toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit'
-                });
-                
-                // Calculate time ago
-                const diffMs = now - date;
-                const diffMins = Math.floor(diffMs / 60000);
-                let timeAgoText = '';
-                
-                if (diffMins < 1) {
-                    timeAgoText = 'Just now';
-                } else if (diffMins < 60) {
-                    timeAgoText = `${diffMins}m ago`;
-                } else if (diffMins < 1440) {
-                    const hours = Math.floor(diffMins / 60);
-                    const mins = diffMins % 60;
-                    if (mins === 0) {
-                        timeAgoText = `${hours}h ago`;
-                    } else {
-                        timeAgoText = `${hours}h ${mins}m ago`;
-                    }
-                } else {
-                    const days = Math.floor(diffMins / 1440);
-                    timeAgoText = `${days}d ago`;
-                }
-                
-                return `
-                    <div class="history-item">
-                        <div class="history-date">
-                            <span>${dateStr}</span>
-                            <span class="time-ago">${timeAgoText}</span>
-                        </div>
-                        <div class="history-duration">${record.duration}</div>
-                        <div class="history-time">Ended at ${timeStr}</div>
-                    </div>
-                `;
-            }).join('');
-        }
+function closeFeedingModal() {
+    const modal = document.getElementById('feedingModal');
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => modal.remove(), 300);
+    }
+}
 
-        // Clear all history
-        function clearHistory() {
-            if (confirm('Are you sure you want to clear all feeding history?')) {
-                localStorage.removeItem('feedingHistory');
-                localStorage.removeItem('nextFeedingReminder');
-                if (twoHourTimer) {
-                    clearTimeout(twoHourTimer);
-                    twoHourTimer = null;
-                }
-                displayHistory();
-                updateLastFeedingTime();
-            }
-        }
+function requestNotifPerm() {
+    if (window.Notification && Notification.permission==='default') Notification.requestPermission();
+}
 
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                } catch (err) { console.log("WakeLock error"); }
-            }
-        }
+// ── Theme ─────────────────────────────────────────────────────
+function setTheme(bg, acc, acc2, el) {
+    document.documentElement.style.setProperty('--bg', bg);
+    document.documentElement.style.setProperty('--accent', acc);
+    document.documentElement.style.setProperty('--accent2', acc2||acc);
+    document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
 
-        function setTheme(bg, accent) {
-            document.documentElement.style.setProperty('--bg-color', bg);
-            document.documentElement.style.setProperty('--accent-color', accent);
-        }
+// ── WakeLock ──────────────────────────────────────────────────
+async function reqWakeLock() {
+    if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); } catch{}
+    }
+}
 
-        function startTimer() {
-            const minsInput = document.getElementById('minutes');
-            remainingSeconds = Math.floor(minsInput.value * 60);
-            totalDuration = remainingSeconds;
-            
-            if(remainingSeconds <= 0) return;
+// ── Prevent unload during timer ───────────────────────────────
+window.addEventListener('beforeunload', e => {
+    if (interval) { e.preventDefault(); e.returnValue = ''; }
+});
 
-            startTime = new Date();
-            isPaused = false;
-            pausedTime = 0;
+// ── Names ─────────────────────────────────────────────────────
+function renderNames(filter='') {
+    const f = filter.trim().toLowerCase();
+    const list = document.getElementById('namesList');
+    const items = NAMES.map((n,i) => {
+        if (f && !n[0].includes(f) && !n[1].toLowerCase().includes(f) && !n[2].includes(f)) return '';
+        return `<div class="name-item">
+            <div class="name-arabic">${n[0]} <span class="name-num">${i+1}</span></div>
+            <div class="name-trans">${n[1]}</div>
+            <div class="name-urdu">${n[2]}</div>
+        </div>`;
+    }).join('');
+    list.innerHTML = items || '<div class="no-history">No results found</div>';
+}
 
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('pauseBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'block';
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('pausedIndicator').style.display = 'none';
-            minsInput.style.display = 'none';
-            document.getElementById('status').innerText = 'Timer Running';
-            
-            requestWakeLock();
-            runTimer();
-        }
+function filterNames() {
+    renderNames(document.getElementById('namesSearch').value);
+}
 
-        function runTimer() {
-            countdown = setInterval(() => {
-                if (!isPaused) {
-                    remainingSeconds--;
-                    updateDisplay(remainingSeconds);
-
-                    if (remainingSeconds <= 0) {
-                        clearInterval(countdown);
-                        triggerAlarm();
-                        saveSession(true); // Completed session
-                    }
-                }
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            isPaused = true;
-            pausedTime = Date.now();
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('resumeBtn').style.display = 'block';
-            document.getElementById('pausedIndicator').style.display = 'block';
-            document.getElementById('status').innerText = 'Timer Paused';
-        }
-
-        function resumeTimer() {
-            isPaused = false;
-            document.getElementById('pauseBtn').style.display = 'block';
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('pausedIndicator').style.display = 'none';
-            document.getElementById('status').innerText = 'Timer Running';
-        }
-
-        function stopTimer() {
-            // Show custom confirmation dialog
-            const userConfirmed = confirm('Are you sure you want to stop the feeding timer?\n\nPress OK to stop the timer.\nPress Cancel to continue feeding.');
-            
-            if (userConfirmed) {
-                // User clicked OK/Yes - proceed with stopping
-                clearInterval(countdown);
-                saveSession(false); // Stopped manually
-                resetUI();
-            }
-            // If user clicked Cancel/No - do nothing, timer continues running
-        }
-
-        function saveSession(completed) {
-            const actualDuration = totalDuration - remainingSeconds;
-            const minutes = Math.floor(actualDuration / 60);
-            const seconds = actualDuration % 60;
-            
-            // Use current time as the feeding end time (not start time)
-            const endTime = new Date();
-            
-            const record = {
-                timestamp: endTime.toISOString(), // Changed from startTime to endTime
-                duration: `${minutes}m ${seconds}s`,
-                completed: completed,
-                targetDuration: `${Math.floor(totalDuration / 60)} minutes`
-            };
-            
-            saveHistory(record);
-            updateLastFeedingTime();
-            
-            // Start 2-hour timer for next feeding reminder
-            startTwoHourReminder();
-        }
-
-        // Start 2-hour countdown for next feeding reminder
-        function startTwoHourReminder() {
-            // Clear any existing timer
-            if (twoHourTimer) {
-                clearTimeout(twoHourTimer);
-            }
-            
-            // Set timer for 2 hours (2 * 60 * 60 * 1000 milliseconds)
-            twoHourTimer = setTimeout(() => {
-                showTwoHourNotification();
-            }, 2 * 60 * 60 * 1000); // 2 hours in milliseconds
-            
-            // Save the reminder time in localStorage for persistence
-            const reminderTime = new Date().getTime() + (2 * 60 * 60 * 1000);
-            localStorage.setItem('nextFeedingReminder', reminderTime);
-        }
-
-        // Show 2-hour notification
-        function showTwoHourNotification() {
-            // Visual notification
-            document.getElementById('body').classList.add('blinking-active');
-            
-            // Vibration
-            if ("vibrate" in navigator) {
-                navigator.vibrate([1000, 500, 1000, 500, 1000]);
-            }
-            
-            // Browser notification (if permission granted)
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("Feeding Time Reminder", {
-                    body: "2 hours have passed since last feeding. Time to feed your baby!",
-                    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='75' font-size='80'%3E👶%3C/text%3E%3C/svg%3E",
-                    requireInteraction: true
-                });
-            }
-            
-            // Alert message
-            setTimeout(() => {
-                alert("⏰ 2 Hours Completed!\n\n2 ghantay puray ho chukay hain.\nTime to feed your baby! 👶🍼");
-                document.getElementById('body').classList.remove('blinking-active');
-            }, 500);
-            
-            // Clear the reminder from localStorage
-            localStorage.removeItem('nextFeedingReminder');
-        }
-
-        // Check for pending reminders on page load
-        function checkPendingReminders() {
-            const reminderTime = localStorage.getItem('nextFeedingReminder');
-            if (reminderTime) {
-                const now = new Date().getTime();
-                const timeLeft = parseInt(reminderTime) - now;
-                
-                if (timeLeft <= 0) {
-                    // Reminder time has passed, show notification immediately
-                    showTwoHourNotification();
-                } else {
-                    // Set timer for remaining time
-                    twoHourTimer = setTimeout(() => {
-                        showTwoHourNotification();
-                    }, timeLeft);
-                }
-            }
-        }
-
-        // Request notification permission on first load
-        function requestNotificationPermission() {
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
-        }
-
-        function updateDisplay(sec) {
-            const m = Math.floor(sec / 60);
-            const s = sec % 60;
-            document.getElementById('display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-
-        function triggerAlarm() {
-            document.getElementById('body').classList.add('blinking-active');
-            document.getElementById('status').innerText = 'Feeding Complete!';
-            if (document.getElementById('vibrateSync').checked && "vibrate" in navigator) {
-                navigator.vibrate([500, 500, 500, 500, 500]);
-            }
-            
-            setTimeout(() => {
-                resetUI();
-            }, 5000);
-        }
-
-        function resetUI() {
-            clearInterval(countdown);
-            document.getElementById('body').classList.remove('blinking-active');
-            document.getElementById('display').innerText = '0:00';
-            document.getElementById('status').innerText = 'Ready to Start';
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('pausedIndicator').style.display = 'none';
-            document.getElementById('minutes').style.display = 'inline-block';
-            isPaused = false;
-            remainingSeconds = 0;
-            if (wakeLock) wakeLock.release();
-        }
-
-        // Initialize history on load
-        window.addEventListener('load', () => {
-            // Set initial quote
-            document.getElementById('quoteText').textContent = `"${getNextQuote()}"`;
-            
-            // Rotate quote every minute
-            setInterval(updateQuote, 60000);
-            
-            displayHistory();
-            updateLastFeedingTime();
-            
-            // Check for pending 2-hour reminders
-            checkPendingReminders();
-            
-            // Request notification permission
-            requestNotificationPermission();
-            
-            // Update last feeding time and history every minute
-            setInterval(() => {
-                updateLastFeedingTime();
-                displayHistory();
-            }, 60000);
-        });
-
-        // Calculate and display time since last feeding
-        function updateLastFeedingTime() {
-            const history = loadHistory();
-            if (history.length === 0) {
-                document.getElementById('lastFeeding').style.display = 'none';
-                return;
-            }
-
-            const lastFeeding = new Date(history[0].timestamp);
-            const now = new Date();
-            const diffMs = now - lastFeeding;
-            const diffMins = Math.floor(diffMs / 60000);
-            
-            let timeAgoText = '';
-            
-            if (diffMins < 1) {
-                timeAgoText = 'Just now';
-            } else if (diffMins < 60) {
-                timeAgoText = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else if (diffMins < 1440) { // Less than 24 hours
-                const hours = Math.floor(diffMins / 60);
-                const mins = diffMins % 60;
-                if (mins === 0) {
-                    timeAgoText = `${hours} hour${hours > 1 ? 's' : ''} ago`;
-                } else {
-                    timeAgoText = `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''} ago`;
-                }
-            } else {
-                const days = Math.floor(diffMins / 1440);
-                timeAgoText = `${days} day${days > 1 ? 's' : ''} ago`;
-            }
-            
-            document.getElementById('lastFeedingTime').innerText = timeAgoText;
-            document.getElementById('lastFeeding').style.display = 'block';
-        }
-    </script>
+function scrollToNames() {
+    document.getElementById('allahNames').scrollIntoView({behavior:'smooth'});
+}
+</script>
 </body>
 </html>
